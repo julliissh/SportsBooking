@@ -1,29 +1,32 @@
-using AuthService.Data;
 using AuthService.Dtos;
 using AuthService.Models;
-using Microsoft.EntityFrameworkCore;
+using AuthService.Repositories;
 
 namespace AuthService.Services;
 
 public class AuthServiceImpl : IAuthService
 {
-    private readonly AuthDbContext _db;
+    private readonly IUserRepository _userRepo;
+    private readonly IRefreshTokenRepository _tokenRepo;
     private readonly ITokenService _tokenService;
     private readonly ILogger<AuthServiceImpl> _logger;
 
-    public AuthServiceImpl(AuthDbContext db, ITokenService tokenService, ILogger<AuthServiceImpl> logger)
+    public AuthServiceImpl(
+        IUserRepository userRepo,
+        IRefreshTokenRepository tokenRepo,
+        ITokenService tokenService,
+        ILogger<AuthServiceImpl> logger)
     {
-        _db = db;
+        _userRepo = userRepo;
+        _tokenRepo = tokenRepo;
         _tokenService = tokenService;
         _logger = logger;
     }
 
     public async Task<(TokenResponse? Tokens, string? Error)> RegisterAsync(RegisterRequest request)
     {
-        if (await _db.Users.AnyAsync(u => u.Email == request.Email))
+        if (await _userRepo.ExistsByEmailAsync(request.Email))
             return (null, "Email already taken");
-
-        var userRole = await _db.Roles.FirstAsync(r => r.Name == "User");
 
         var user = new User
         {
@@ -32,16 +35,7 @@ public class AuthServiceImpl : IAuthService
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password)
         };
 
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync();
-
-        _db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = userRole.Id });
-        await _db.SaveChangesAsync();
-
-        // reload with roles
-        user = await _db.Users
-            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-            .FirstAsync(u => u.Id == user.Id);
+        await _userRepo.AddUserWithRoleAsync(user, "User");
 
         var tokens = await IssueTokensAsync(user);
         _logger.LogInformation("User registered: {Email}", request.Email);
@@ -50,9 +44,7 @@ public class AuthServiceImpl : IAuthService
 
     public async Task<(TokenResponse? Tokens, string? Error)> LoginAsync(LoginRequest request)
     {
-        var user = await _db.Users
-            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.Email == request.Email && u.IsActive);
+        var user = await _userRepo.GetByEmailAsync(request.Email);
 
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
@@ -67,9 +59,7 @@ public class AuthServiceImpl : IAuthService
 
     public async Task<(TokenResponse? Tokens, string? Error)> RefreshAsync(string refreshToken)
     {
-        var token = await _db.RefreshTokens
-            .Include(t => t.User).ThenInclude(u => u.UserRoles).ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(t => t.Token == refreshToken);
+        var token = await _tokenRepo.GetActiveTokenAsync(refreshToken);
 
         if (token is null || !token.IsActive)
             return (null, "Invalid or expired refresh token");
@@ -79,14 +69,14 @@ public class AuthServiceImpl : IAuthService
         token.RevokedAt = DateTime.UtcNow;
         token.ReplacedByToken = newRefresh;
 
-        _db.RefreshTokens.Add(new RefreshToken
+        await _tokenRepo.AddAsync(new RefreshToken
         {
             UserId = token.UserId,
             Token = newRefresh,
             ExpiresAt = _tokenService.GetRefreshTokenExpiry()
         });
 
-        await _db.SaveChangesAsync();
+        await _tokenRepo.SaveChangesAsync();
 
         var accessToken = _tokenService.GenerateAccessToken(token.User);
         return (new TokenResponse(accessToken, newRefresh), null);
@@ -94,11 +84,11 @@ public class AuthServiceImpl : IAuthService
 
     public async Task<bool> LogoutAsync(string refreshToken)
     {
-        var token = await _db.RefreshTokens.FirstOrDefaultAsync(t => t.Token == refreshToken);
+        var token = await _tokenRepo.GetActiveTokenAsync(refreshToken);
         if (token is null) return false;
 
         token.RevokedAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync();
+        await _tokenRepo.SaveChangesAsync();
         return true;
     }
 
@@ -107,13 +97,13 @@ public class AuthServiceImpl : IAuthService
         var accessToken = _tokenService.GenerateAccessToken(user);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
-        _db.RefreshTokens.Add(new RefreshToken
+        await _tokenRepo.AddAsync(new RefreshToken
         {
             UserId = user.Id,
             Token = refreshToken,
             ExpiresAt = _tokenService.GetRefreshTokenExpiry()
         });
-        await _db.SaveChangesAsync();
+        await _tokenRepo.SaveChangesAsync();
 
         return new TokenResponse(accessToken, refreshToken);
     }

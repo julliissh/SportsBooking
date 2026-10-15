@@ -11,7 +11,6 @@ builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
     .AddOcelot();
 
-// Read all service addresses from config
 var monolithHost = builder.Configuration["Gateway:MonolithHost"] ?? "localhost";
 var monolithPort = builder.Configuration.GetValue<int>("Gateway:MonolithPort", 5100);
 var authHost     = builder.Configuration["Gateway:AuthHost"]     ?? "localhost";
@@ -19,7 +18,6 @@ var authPort     = builder.Configuration.GetValue<int>("Gateway:AuthPort", 5001)
 var catalogHost  = builder.Configuration["Gateway:CatalogHost"]  ?? "localhost";
 var catalogPort  = builder.Configuration.GetValue<int>("Gateway:CatalogPort", 5002);
 
-// Inject addresses into Ocelot routes (ocelot.json has empty Host/Port placeholders)
 builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 {
     // Routes[0] = /api/v1/auth/** -> AuthService
@@ -44,11 +42,10 @@ var app = builder.Build();
 
 app.UseCors();
 
-// Health endpoint — must be BEFORE UseOcelot (terminal middleware)
 app.Map("/health", health => health.Run(ctx =>
     ctx.Response.WriteAsJsonAsync(new { status = "OK", service = "ApiGateway" })));
 
-// Logging middleware — log every /api request
+
 app.Use(async (context, next) =>
 {
     if (!context.Request.Headers.ContainsKey("X-Correlation-Id"))

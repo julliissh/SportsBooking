@@ -16,7 +16,6 @@ public class CatalogController : ControllerBase
         _catalogService = catalogService;
     }
 
-    /// <summary>Get venues list with pagination, search and sort</summary>
     [HttpGet("items")]
     [ProducesResponseType<VenueListDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -35,7 +34,6 @@ public class CatalogController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>Get venue by id</summary>
     [HttpGet("items/{id}")]
     [ProducesResponseType<VenueDetailsDto>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -45,7 +43,6 @@ public class CatalogController : ControllerBase
         return venue is null ? NotFound() : Ok(venue);
     }
 
-    /// <summary>Create a new venue (Admin only)</summary>
     [HttpPost("items")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType<VenueDetailsDto>(StatusCodes.Status201Created)]
@@ -57,7 +54,6 @@ public class CatalogController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = venue.Id }, venue);
     }
 
-    /// <summary>Update a venue (Admin only)</summary>
     [HttpPut("items/{id}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -68,7 +64,6 @@ public class CatalogController : ControllerBase
         return ok ? NoContent() : NotFound();
     }
 
-    /// <summary>Soft-delete a venue (Admin only)</summary>
     [HttpDelete("items/{id}")]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -79,7 +74,6 @@ public class CatalogController : ControllerBase
         return ok ? NoContent() : NotFound();
     }
 
-    /// <summary>Get all categories</summary>
     [HttpGet("categories")]
     [ProducesResponseType<List<CategoryDto>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetCategories()

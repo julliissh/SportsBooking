@@ -18,10 +18,10 @@ public class AuthDbContext : DbContext
         modelBuilder.Entity<User>(e =>
         {
             e.HasIndex(u => u.Email).IsUnique();
-            e.Property(u => u.Email).HasMaxLength(256);
+            e.Property(u => u.Email).HasMaxLength(191);
             e.Property(u => u.DisplayName).HasMaxLength(100);
             e.Property(u => u.PasswordHash).HasMaxLength(256);
-            e.Property(u => u.CreatedAt).HasDefaultValueSql("NOW()");
+            e.Property(u => u.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
         });
 
         // UserRole — many-to-many
@@ -36,7 +36,7 @@ public class AuthDbContext : DbContext
         modelBuilder.Entity<RefreshToken>(e =>
         {
             e.Property(r => r.Token).HasMaxLength(256);
-            e.Property(r => r.CreatedAt).HasDefaultValueSql("NOW()");
+            e.Property(r => r.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
         });
 
         // Seed roles
@@ -52,7 +52,7 @@ public class AuthDbContext : DbContext
                 Id = 1,
                 Email = "admin@sportsbooking.com",
                 DisplayName = "Administrator",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                PasswordHash = "$2a$11$Sw4nvueeSlydwF5WPl/cAueBtFeVOX6YYoz14JJ.88DYCyR8SsY3O",
                 CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                 IsActive = true
             }

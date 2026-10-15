@@ -1,62 +1,35 @@
-using CatalogService.Data;
 using CatalogService.Dtos;
 using CatalogService.Models;
-using Microsoft.EntityFrameworkCore;
+using CatalogService.Repositories;
 
 namespace CatalogService.Services;
 
 public class CatalogServiceImpl : ICatalogService
 {
-    private readonly CatalogDbContext _db;
+    private readonly ICatalogRepository _repo;
     private readonly ILogger<CatalogServiceImpl> _logger;
 
-    public CatalogServiceImpl(CatalogDbContext db, ILogger<CatalogServiceImpl> logger)
+    public CatalogServiceImpl(ICatalogRepository repo, ILogger<CatalogServiceImpl> logger)
     {
-        _db = db;
+        _repo = repo;
         _logger = logger;
     }
 
-    public async Task<VenueListDto> GetVenuesAsync(int page, int pageSize, string? search, int? categoryId, string? sortBy, bool desc)
+    public async Task<VenueListDto> GetVenuesAsync(
+        int page, int pageSize, string? search, int? categoryId, string? sortBy, bool desc)
     {
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
-        var query = _db.Venues
-            .Include(v => v.Category)
-            .Where(v => v.IsActive);
-
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(v => v.Name.Contains(search) || v.Address.Contains(search));
-
-        if (categoryId.HasValue)
-            query = query.Where(v => v.CategoryId == categoryId.Value);
-
-        query = (sortBy?.ToLower(), desc) switch
-        {
-            ("price", false) => query.OrderBy(v => v.PricePerHour),
-            ("price", true) => query.OrderByDescending(v => v.PricePerHour),
-            ("name", true) => query.OrderByDescending(v => v.Name),
-            _ => query.OrderBy(v => v.Name)
-        };
-
-        var total = await query.CountAsync();
-        var items = await query
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .Select(v => new VenueDto(v.Id, v.Name, v.Address, v.PricePerHour, v.Description, v.Category.Name))
-            .ToListAsync();
-
-        return new VenueListDto(items, page, pageSize, total);
+        var (items, total) = await _repo.GetPageAsync(page, pageSize, search, categoryId, sortBy, desc);
+        var dtos = items.Select(ToDto).ToList();
+        return new VenueListDto(dtos, page, pageSize, total);
     }
 
     public async Task<VenueDetailsDto?> GetByIdAsync(int id)
     {
-        var v = await _db.Venues
-            .Include(v => v.Category)
-            .FirstOrDefaultAsync(v => v.Id == id && v.IsActive);
-
-        return v is null ? null
-            : new VenueDetailsDto(v.Id, v.Name, v.Address, v.PricePerHour, v.Description, v.Category.Name, v.CategoryId);
+        var v = await _repo.GetByIdAsync(id);
+        return v is null ? null : ToDetailsDto(v);
     }
 
     public async Task<VenueDetailsDto> CreateAsync(CreateVenueRequest request)
@@ -69,17 +42,19 @@ public class CatalogServiceImpl : ICatalogService
             Description = request.Description,
             CategoryId = request.CategoryId
         };
-        _db.Venues.Add(venue);
-        await _db.SaveChangesAsync();
-        _logger.LogInformation("Created venue: {Name}", venue.Name);
 
-        var saved = await _db.Venues.Include(v => v.Category).FirstAsync(v => v.Id == venue.Id);
-        return new VenueDetailsDto(saved.Id, saved.Name, saved.Address, saved.PricePerHour, saved.Description, saved.Category.Name, saved.CategoryId);
+        await _repo.AddAsync(venue);
+        await _repo.SaveChangesAsync();
+
+        _logger.LogInformation("Venue created: {Name} (id={Id})", venue.Name, venue.Id);
+
+        var saved = await _repo.GetByIdAsync(venue.Id);
+        return ToDetailsDto(saved!);
     }
 
     public async Task<bool> UpdateAsync(int id, UpdateVenueRequest request)
     {
-        var venue = await _db.Venues.FirstOrDefaultAsync(v => v.Id == id && v.IsActive);
+        var venue = await _repo.GetByIdAsync(id);
         if (venue is null) return false;
 
         venue.Name = request.Name;
@@ -88,26 +63,31 @@ public class CatalogServiceImpl : ICatalogService
         venue.Description = request.Description;
         venue.CategoryId = request.CategoryId;
 
-        await _db.SaveChangesAsync();
-        _logger.LogInformation("Updated venue: {Id}", id);
+        await _repo.SaveChangesAsync();
+        _logger.LogInformation("Venue updated: id={Id}", id);
         return true;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var venue = await _db.Venues.FirstOrDefaultAsync(v => v.Id == id && v.IsActive);
+        var venue = await _repo.GetByIdAsync(id);
         if (venue is null) return false;
 
-        venue.IsActive = false; // soft delete
-        await _db.SaveChangesAsync();
-        _logger.LogInformation("Soft-deleted venue: {Id}", id);
+        venue.IsActive = false;
+        await _repo.SaveChangesAsync();
+        _logger.LogInformation("Venue soft-deleted: id={Id}", id);
         return true;
     }
 
     public async Task<List<CategoryDto>> GetCategoriesAsync()
     {
-        return await _db.Categories
-            .Select(c => new CategoryDto(c.Id, c.Name))
-            .ToListAsync();
+        var categories = await _repo.GetCategoriesAsync();
+        return categories.Select(c => new CategoryDto(c.Id, c.Name)).ToList();
     }
+
+    private static VenueDto ToDto(Venue v) =>
+        new(v.Id, v.Name, v.Address, v.PricePerHour, v.Description, v.Category.Name);
+
+    private static VenueDetailsDto ToDetailsDto(Venue v) =>
+        new(v.Id, v.Name, v.Address, v.PricePerHour, v.Description, v.Category.Name, v.CategoryId);
 }

@@ -1,25 +1,21 @@
-using AuthService.Data;
 using AuthService.Dtos;
 using AuthService.Models;
-using Microsoft.EntityFrameworkCore;
+using AuthService.Repositories;
 
 namespace AuthService.Services;
 
 public class UserServiceImpl : IUserService
 {
-    private readonly AuthDbContext _db;
+    private readonly IUserRepository _userRepo;
 
-    public UserServiceImpl(AuthDbContext db)
+    public UserServiceImpl(IUserRepository userRepo)
     {
-        _db = db;
+        _userRepo = userRepo;
     }
 
     public async Task<UserDto?> GetMeAsync(int userId)
     {
-        var user = await _db.Users
-            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.Id == userId && u.IsActive);
-
+        var user = await _userRepo.GetWithRolesAsync(userId);
         return user is null ? null : ToDto(user);
     }
 
@@ -28,36 +24,23 @@ public class UserServiceImpl : IUserService
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
-        var query = _db.Users
-            .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-            .Where(u => u.IsActive);
-
-        var total = await query.CountAsync();
-        var items = await query
-            .OrderBy(u => u.Id)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
+        var (items, total) = await _userRepo.GetPagedUsersAsync(page, pageSize);
         return new UserListDto(items.Select(ToDto).ToList(), page, pageSize, total);
     }
 
     public async Task<bool> UpdateRolesAsync(int userId, List<string> roleNames)
     {
-        var user = await _db.Users
-            .Include(u => u.UserRoles)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
+        var user = await _userRepo.GetWithRolesAsync(userId);
         if (user is null) return false;
 
-        var roles = await _db.Roles.Where(r => roleNames.Contains(r.Name)).ToListAsync();
+        var roles = await _userRepo.GetRolesByNamesAsync(roleNames);
         if (roles.Count != roleNames.Count) return false;
 
-        _db.UserRoles.RemoveRange(user.UserRoles);
+        user.UserRoles.Clear();
         foreach (var role in roles)
-            _db.UserRoles.Add(new UserRole { UserId = userId, RoleId = role.Id });
+            user.UserRoles.Add(new UserRole { UserId = userId, RoleId = role.Id });
 
-        await _db.SaveChangesAsync();
+        await _userRepo.SaveChangesAsync();
         return true;
     }
 

@@ -25,14 +25,14 @@ public class CatalogDbContext : DbContext
             e.Property(c => c.Name).HasMaxLength(100);
         });
 
-        // Seed categories
+      
         modelBuilder.Entity<Category>().HasData(
             new Category { Id = 1, Name = "Football" },
             new Category { Id = 2, Name = "Tennis" },
             new Category { Id = 3, Name = "Basketball" }
         );
 
-        // Seed venues
+   
         modelBuilder.Entity<Venue>().HasData(
             new Venue { Id = 1, Name = "Central Football Field", Address = "Main St 1", PricePerHour = 500, CategoryId = 1, IsActive = true },
             new Venue { Id = 2, Name = "Tennis Club Kyiv", Address = "Park Ave 5", PricePerHour = 300, CategoryId = 2, IsActive = true },
