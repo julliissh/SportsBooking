@@ -1,0 +1,1 @@
+{"type":"https://tools.ietf.org/html/rfc9110#section-15.6.4","title":"Перевищено час очікування CatalogService","status":503,"detail":"Сервіс каталогу не відповів у межах встановленого таймауту (2 с).","traceId":"00-e83f55b82dfd012db66249d08715d2a7-23c41d60e8239ed4-00"}
