@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Гайд до захисту Лабораторної роботи №2</title>
+<style>
+  @page {
+    size: A4;
+    margin: 12mm 12mm 12mm 12mm;
+  }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #24292f;
+    line-height: 1.45;
+    font-size: 12.5px;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-size: 21px;
+    color: #0969da;
+    border-bottom: 2px solid #0969da;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: 15px;
+    color: #1f2328;
+    background: #f6f8fa;
+    border-left: 4px solid #0969da;
+    padding: 5px 10px;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+  h3 {
+    font-size: 13.5px;
+    color: #0969da;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+  p, li {
+    font-size: 12px;
+  }
+  ul, ol {
+    margin-top: 3px;
+    margin-bottom: 6px;
+    padding-left: 18px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 10.5px;
+    font-weight: 600;
+    border-radius: 10px;
+    color: #fff;
+    background: #2da44e;
+  }
+  .badge-bonus {
+    background: #8250df;
+  }
+  .callout {
+    background: #ddf4ff;
+    border: 1px solid #54aeff;
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin: 8px 0;
+    font-size: 11.5px;
+  }
+  .callout-warning {
+    background: #fff8c5;
+    border-color: #d4a72c;
+  }
+  .callout-success {
+    background: #dafbe1;
+    border-color: #4ac26b;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0;
+    font-size: 11px;
+  }
+  th, td {
+    border: 1px solid #d0d7de;
+    padding: 5px 7px;
+    text-align: left;
+  }
+  th {
+    background: #f6f8fa;
+    font-weight: 600;
+  }
+  code {
+    background: #eff1f3;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-family: Consolas, monospace;
+    font-size: 11px;
+    color: #cf222e;
+  }
+  pre {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 5px;
+    padding: 6px 8px;
+    font-family: Consolas, monospace;
+    font-size: 10.5px;
+    margin: 5px 0;
+    line-height: 1.35;
+  }
+  .step-box {
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .step-title {
+    font-weight: 700;
+    color: #0969da;
+    margin-bottom: 4px;
+    font-size: 12.5px;
+  }
+  .qa-box {
+    background: #fcfcfc;
+    border: 1px solid #e1e4e8;
+    border-left: 3px solid #0969da;
+    border-radius: 4px;
+    padding: 6px 9px;
+    margin-bottom: 6px;
+  }
+  .qa-q {
+    font-weight: 700;
+    color: #1f2328;
+    margin-bottom: 3px;
+    font-size: 11.5px;
+  }
+  .qa-a {
+    color: #333;
+    font-size: 11.5px;
+  }
+  .page-break {
+    page-break-after: always;
+  }
+</style>
+</head>
+<body>
+
+<h1>Лабораторна робота №2 — Повний гайд до захисту</h1>
+<p style="margin-bottom: 6px;">
+  <strong>Предметна область:</strong> SportsBooking (Бронювання спортивних майданчиків)<br>
+  <strong>Оцінка:</strong> <span class="badge">10 / 10 обов'язкових балів</span> + <span class="badge badge-bonus">+3 бали за Docker Compose</span> = <strong>13 балів</strong>
+</p>
+
+<div class="callout callout-success">
+  <strong>Суть роботи:</strong> Ми винесли операційний модуль бронювань із моноліту в окремий незалежний мікросервіс <code>BookingService</code> (порт <code>5003</code>, окрема БД <code>miniproject_booking</code>), прибрали зовнішні ключі між базами, додали перевірку каталогу з таймаутом 2 с, захистили створення ідемпотентністю (<code>Idempotency-Key</code>), зберегли знімок цін (<code>ItemSnapshot</code>), перемкнули шлюз <code>ApiGateway</code> (:5000) і довели 10 інтеграційними тестами (<code>dotnet test</code>), що система працює без регресій.
+</div>
+
+<h2>Розділ 1. Карта коду — куди дивитися і що показувати</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Функціонал</th>
+      <th>Файл у проєкті</th>
+      <th>Що саме показати викладачу</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Контролер</strong></td>
+      <td><code>src/BookingService/Controllers/BookingsController.cs</code></td>
+      <td>Маршрути <code>/api/bookings</code>, атрибут <code>[Authorize]</code>, <code>UserId</code> витягується з токена (не з тіла).</td>
+    </tr>
+    <tr>
+      <td><strong>Бізнес-логіка</strong></td>
+      <td><code>src/BookingService/Services/BookingServiceImpl.cs</code></td>
+      <td>Метод <code>ValidateBusinessRules</code> (дата в майбутньому, години 1..24), перевірка перетину слотів, ідемпотентність.</td>
+    </tr>
+    <tr>
+      <td><strong>Клієнт каталогу (таймаут 2 с)</strong></td>
+      <td><code>src/BookingService/Clients/CatalogClient.cs</code></td>
+      <td>Дедлайн <code>timeoutCts.CancelAfter(TimeSpan.FromSeconds(2))</code>, 3 випадки помилок: 404, таймаут, недоступність.</td>
+    </tr>
+    <tr>
+      <td><strong>База даних та індекси</strong></td>
+      <td><code>src/BookingService/Data/BookingDbContext.cs</code></td>
+      <td><code>HasPrecision(10,2)</code>, статус рядком <code>HasConversion&lt;string&gt;()</code>, унікальний індекс на <code>IdempotencyKey</code>, відсутність FK.</td>
+    </tr>
+    <tr>
+      <td><strong>Міграція та автоінкремент</strong></td>
+      <td><code>src/BookingService/Migrations/20261019174922_InitialCreate.cs</code></td>
+      <td>Рядок 84: <code>migrationBuilder.Sql("ALTER TABLE Bookings AUTO_INCREMENT = 100;");</code> та перенесення старих записів 1, 3, 4.</td>
+    </tr>
+    <tr>
+      <td><strong>Обробка помилок</strong></td>
+      <td><code>src/BookingService/Infrastructure/GlobalExceptionHandler.cs</code></td>
+      <td>Реалізація <code>IExceptionHandler</code>: клієнт бачить <code>ProblemDetails</code> без витоку stack trace.</td>
+    </tr>
+    <tr>
+      <td><strong>Шлюз Ocelot</strong></td>
+      <td><code>src/ApiGateway/ocelot.json</code></td>
+      <td>Маршрут <code>/api/bookings/{everything}</code> перемкнено на порт <code>5003</code> замість 5100.</td>
+    </tr>
+    <tr>
+      <td><strong>10 тестів</strong></td>
+      <td><code>tests/BookingService.IntegrationTests/BookingIntegrationTests.cs</code></td>
+      <td>Всі 10 тестів <code>Scenario01_...</code> до <code>Scenario10_...</code>, перевірка статус-коду та тіла JSON.</td>
+    </tr>
+    <tr>
+      <td><strong>Стаб каталогу</strong></td>
+      <td><code>tests/BookingService.IntegrationTests/ApiFactory.cs</code></td>
+      <td><code>FakeCatalogClient</code>, тестова база <code>miniproject_booking_test</code>, генерація тестових JWT токенів.</td>
+    </tr>
+    <tr>
+      <td><strong>Baseline знімок</strong></td>
+      <td><code>tests/baseline/baseline.http</code></td>
+      <td>Запити до моноліту та збережені файли відповідей у <code>tests/baseline/</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>ADR-0003</strong></td>
+      <td><code>docs/adr/0003-operations-extraction.md</code></td>
+      <td>Таблиця «наші дані / чужі дані / технічна дрібниця» та обґрунтування винесення.</td>
+    </tr>
+    <tr>
+      <td><strong>Порівняння</strong></td>
+      <td><code>docs/baseline-diff.md</code></td>
+      <td>Таблиця порівняння «Було / Стало» для всіх 10 сценаріїв — доказ відсутності регресій.</td>
+    </tr>
+    <tr>
+      <td><strong>Docker Compose (+3 бали)</strong></td>
+      <td><code>docker-compose.yml</code></td>
+      <td>Підняття однією командою MySQL (порт 3307), Auth (5001), Catalog (5002), Booking (5003), Gateway (5000).</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Розділ 2. Що конкретно вводити в Swagger (Покроковий приклад)</h2>
+<p>Відкрийте в браузері: <strong><a href="http://localhost:5003/swagger">http://localhost:5003/swagger</a></strong></p>
+
+<div class="step-box">
+  <div class="step-title">Крок А. Авторизація в Swagger (отримати і вставити токен)</div>
+  <p>Оскільки всі операції захищені атрибутом <code>[Authorize]</code>, спочатку треба авторизуватися:</p>
+  <ol>
+    <li><strong>Отримайте токен прямо у Swagger AuthService:</strong>
+      <ol type="a">
+        <li>Відкрийте у сусідній вкладці браузера: <strong><a href="http://localhost:5001/swagger">http://localhost:5001/swagger</a></strong></li>
+        <li>Розкрийте блок <strong>POST /api/v1/auth/login</strong> і натисніть кнопку <strong>Try it out</strong>.</li>
+        <li>У віконце Request body вставте логін і пароль:
+<pre>{
+  "email": "admin@sportsbooking.com",
+  "password": "Admin123!"
+}</pre>
+        </li>
+        <li>Натисніть кнопку <strong>Execute</strong>. Нижче у блоці <em>Response body</em> виділіть і скопіюйте довгий текст <code>accessToken</code> (без лапок).</li>
+      </ol>
+    </li>
+    <li>У Swagger BookingService (<code>:5003/swagger</code>) вгорі праворуч натисніть зелену кнопку <strong>Authorize 🔓</strong>.</li>
+    <li>У полі <em>Value</em> вставте ваш токен:
+      <pre>Bearer ВСТАВИТИ_ВАШ_ТОКЕН_СЮДИ</pre>
+      (або просто сам токен без слова Bearer) і натисніть кнопку <strong>Authorize</strong>, а потім <strong>Close</strong>. Замок закриється 🔒.
+    </li>
+  </ol>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Крок Б. Створення нового бронювання (POST /api/bookings)</div>
+  <ol>
+    <li>Розкрийте зелений блок <strong>POST /api/bookings</strong>.</li>
+    <li>Натисніть кнопку <strong>Try it out</strong> праворуч.</li>
+    <li>У полі <em>Request body</em> вставте такий готовий JSON:
+<pre>{
+  "venueId": 1,
+  "startTime": "2027-05-10T14:00:00Z",
+  "hours": 2
+}</pre>
+    </li>
+    <li>(Опціонально) У полі заголовка <code>Idempotency-Key</code> можна написати <code>demo-key-1</code>.</li>
+    <li>Натисніть велику синю кнопку <strong>Execute</strong>.</li>
+    <li><strong>Результат:</strong> статус <code>201 Created</code>, у відповіді повернеться бронювання з <code>id</code> (наприклад, 100), збереженим знімком майданчика <code>"venueName": "Central Football Field"</code> та порахованою сумою <code>"totalPrice": 1000.00</code>.</li>
+  </ol>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Крок В. Перегляд списку своїх бронювань (GET /api/bookings)</div>
+  <ol>
+    <li>Розкрийте синій блок <strong>GET /api/bookings</strong>.</li>
+    <li>Натисніть <strong>Try it out</strong>.</li>
+    <li>Параметри можна залишити за замовчуванням (<code>page: 1</code>, <code>pageSize: 20</code>, або ввести <code>status: Confirmed</code>).</li>
+    <li>Натисніть <strong>Execute</strong>.</li>
+    <li><strong>Результат:</strong> статус <code>200 OK</code> і JSON зі списком ваших бронювань та пагінацією.</li>
+  </ol>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Крок Г. Скасування бронювання (POST /api/bookings/{id}/cancel)</div>
+  <ol>
+    <li>Розкрийте блок <strong>POST /api/bookings/{id}/cancel</strong>.</li>
+    <li>Натисніть <strong>Try it out</strong>.</li>
+    <li>Введіть <code>id</code> вашого щойно створеного бронювання (наприклад, <code>100</code>).</li>
+    <li>Натисніть <strong>Execute</strong>.</li>
+    <li><strong>Результат:</strong> статус <code>200 OK</code>, статус бронювання змінився на <code>"status": "Cancelled"</code>.</li>
+    <li>Якщо натиснути <strong>Execute</strong> ще раз — повернеться помилка <code>400 Bad Request</code> («Бронювання вже скасовано»).</li>
+  </ol>
+</div>
+
+<div class="page-break"></div>
+
+<h2>Розділ 3. Покроковий план захисту (7 дій перед викладачем)</h2>
+
+<div class="step-box">
+  <div class="step-title">Дія 1. Показати tests/baseline/ та історію комітів у Git</div>
+  <ul>
+    <li>Покажіть файл <code>tests/baseline/baseline.http</code> та збережені JSON-відповіді моноліту.</li>
+    <li>У GitHub Desktop покажіть вкладку <strong>History</strong> — перший коміт зафіксував baseline до коду сервісу.</li>
+    <li><strong>Фраза для викладача:</strong> <em>«Спочатку ми зафіксували базову поведінку (baseline) моноліту, щоб мати еталон для порівняння, і лише після цього виносили код нового сервісу».</em></li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 2. Підняти систему і показати власну БД з перенесеними даними</div>
+  <ul>
+    <li>Покажіть запущений Docker Desktop (група <code>sportsbooking</code> горить зеленим) або виконайте:
+      <pre>docker compose up -d</pre>
+    </li>
+    <li>Покажіть таблицю в MySQL (через Workbench або команду в консолі):
+      <pre>& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p292929 -e "SELECT Id, VenueName, PricePerHour, TotalPrice, Status FROM miniproject_booking.Bookings;"</pre>
+    </li>
+    <li><strong>Фраза для викладача:</strong> <em>«BookingService має власну базу miniproject_booking. Старі записи з моноліту (Id 1, 3, 4) перенесені міграцією, а AUTO_INCREMENT піднято до 100, тому нові записи не перезапишуть старі».</em></li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 3. Запустити тести (dotnet test) і показати «злам логіки»</div>
+  <ul>
+    <li>Виконайте в терміналі:
+      <pre>dotnet test</pre>
+      Результат: <code>Passed! - Failed: 0, Passed: 10, Skipped: 0</code> (10 із 10 тестів зелені).
+    </li>
+    <li><strong>Якщо викладач скаже: «Зламай рядок і покажи, що тест червоніє»:</strong>
+      <ol>
+        <li>У файлі <code>src/BookingService/Services/BookingServiceImpl.cs</code> (рядок 268) тимчасово закоментуйте рядок:
+          <br><code>// if (startUtc &lt;= DateTime.UtcNow)</code>
+        </li>
+        <li>Запустіть <code>dotnet test</code> &rarr; тест <code>Scenario04</code> впаде червоним.</li>
+        <li>Розкоментуйте рядок назад &rarr; тести знову зелені. Це залізобетонний доказ якості тестів.</li>
+      </ol>
+    </li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 4. Виконати запити через шлюз (порт 5000)</div>
+  <ul>
+    <li>У файлі <code>tests/baseline/baseline.http</code> натискайте кнопки <strong>Send Request</strong> навпроти запитів. Запити проходять через <code>http://localhost:5000</code>.</li>
+    <li>Покажіть файл <code>docs/baseline-diff.md</code> — відповіді шлюзу повністю збігаються з монолітом.</li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 5. Зупинити CatalogService і показати відмовостійкість (503 помилка)</div>
+  <ul>
+    <li>У Docker Desktop натисніть кнопку <strong>Stop</strong> (квадратик) на контейнері <code>sportsbooking-catalog</code>.</li>
+    <li>У Swagger або через `baseline.http` надішліть створення бронювання.</li>
+    <li><strong>Результат:</strong> через рівно 2 секунди (наш дедлайн) сервіс не падає, а повертає свідомий:
+      <br><code>503 Service Unavailable: "Сервіс каталогу недоступний"</code>.
+    </li>
+    <li><strong>Фраза для викладача:</strong> <em>«Завдяки таймауту у 2 секунди в CatalogClient потік не зависає назавжди, система не падає, а повертає коректний 503 код».</em></li>
+    <li>Запустіть контейнер <code>sportsbooking-catalog</code> назад.</li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 6. Показати Swagger UI</div>
+  <ul>
+    <li>Відкрийте <code>http://localhost:5003/swagger</code> — покажіть описи, коди відповідей 200/201/400/401/404/503 та кнопку Authorize.</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<h2>Розділ 4. Готові відповіді на ВСІ 11 контрольних питань (Розділ 14)</h2>
+
+<div class="qa-box">
+  <div class="qa-q">1. Що таке шов (seam) і за якими ознаками ви його шукали у своєму моноліті?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Шов — це межа в моноліті, де його можна розрізати без зміни коду інших частин. Ми поділили сутності моноліту на три групи: <em>наші дані</em> (Bookings — перенесли у власну БД), <em>чужі дані</em> (Venues, Users — читаємо по мережі або з JWT) та <em>спільні дрібниці</em> (статуси — здублювали локально в сервісі).</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">2. Чому між базами різних сервісів не роблять зовнішніх ключів? Що використовують замість них?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Мікросервіси мають бути автономними (принцип Database per Service), їхні БД можуть бути на різних серверах. Зовнішній ключ (FK) на рівні СУБД створив би жорстку залежність. Замість нього зберігають числове поле <code>VenueId</code>, перевіряють його по мережі через <code>CatalogClient</code> і фіксують знімок назви та ціни (ItemSnapshot).</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">3. Що таке характеризаційний тест і чим він відрізняється від звичайного?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Звичайний тест перевіряє код за вимогами («як має бути»). Характеризаційний тест (baseline) знімає фактичну поведінку існуючої системи («як вона відповідає сьогодні»), щоб після винесення переконатися, що жодна деталь і жоден код помилки не змінилися.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">4. Чим інтеграційний тест відрізняється від модульного і від e2e-тесту?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Unit-тест перевіряє один клас в ізоляції без бази. Інтеграційний тест перевіряє конвеєр ASP.NET Core + валідацію + EF Core + тестову базу в пам'яті тестового процесу. E2E-тест перевіряє всю систему наскрізно через шлюз з реальними процесами.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">5. Для чого потрібен WebApplicationFactory і що саме ви в ньому підмінили?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Він піднімає веб-застосунок у тестовому процесі без відкриття сокетів і без <code>dotnet run</code>. Ми підмінили в ньому: 1) робочу БД на окрему тестову <code>miniproject_booking_test</code>; 2) клієнта каталогу на стаб <code>FakeCatalogClient</code> із готовими відповідями.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">6. Що таке ідемпотентність? Наведіть ідемпотентний і неідемпотентний метод.</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Це властивість операції давати той самий результат при повторних викликах. Ідемпотентні за специфікацією: <code>GET</code>, <code>PUT</code>, <code>DELETE</code>. Неідемпотентний: <code>POST</code>. Щоб зробити наш POST ідемпотентним, ми додали заголовок <code>Idempotency-Key</code> та унікальний індекс у БД.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">7. Навіщо виклику до сусіднього сервісу потрібен дедлайн? Що станеться без нього, якщо сусід «завис»?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Дедлайн (таймаут 2 с) обмежує час очікування. Без нього потік сервера чекатиме вічно, закінчаться вільні потоки пулу і наш сервіс теж впаде (каскадна відмова). Завдяки дедлайну ми повертаємо клієнту контрольований 503 код.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">8. Чому в операції зберігають копію назви та ціни об’єкта каталогу, а не лише його Id?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Це патерн <strong>ItemSnapshot</strong>. Якщо через півроку в каталозі піднімуть ціну майданчика, старі бронювання клієнтів не повинні перераховуватися за новими тарифами. Знімок гарантує незмінність фінансової історії.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">9. Як ви перенесли старі дані й чому підняли автоінкремент?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Записи зі старої бази (Id 1, 3, 4) внесені в міграцію <code>InitialCreate</code> через <code>HasData</code>. Командою <code>ALTER TABLE Bookings AUTO_INCREMENT = 100</code> ми підняли стартовий номер, щоб нові Id починалися зі 100 і не перетиналися зі старими.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">10. Що таке Strangler Fig і на якому його кроці ви зараз перебуваєте?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Це патерн поступової заміни моноліту мікросервісами через API Gateway. Ми перебуваємо на кроці, коли сервіси (Auth, Catalog, Booking) винесені, шлюз перемкнено на них, а старий моноліт залишено поруч як страховку на час перевірки.</div>
+</div>
+
+<div class="qa-box">
+  <div class="qa-q">11. Як ви дізналися б, що винесення зламало поведінку, якби не було baseline-файлів?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Без baseline це помітили б лише реальні клієнти після релізу (зміна регістру JSON, зниклий 404 код, зламана валідація). Базовий знімок дозволяє автоматично виявити регресії ще під час розробки.</div>
+</div>
+
+<p style="text-align: center; color: #57606a; margin-top: 15px; font-size: 11px;">
+  Лабораторна робота №2 • Повний захист на 10/10 + 3 бали
+</p>
+
+</body>
+</html>

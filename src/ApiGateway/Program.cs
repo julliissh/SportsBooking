@@ -17,6 +17,8 @@ var authHost     = builder.Configuration["Gateway:AuthHost"]     ?? "localhost";
 var authPort     = builder.Configuration.GetValue<int>("Gateway:AuthPort", 5001);
 var catalogHost  = builder.Configuration["Gateway:CatalogHost"]  ?? "localhost";
 var catalogPort  = builder.Configuration.GetValue<int>("Gateway:CatalogPort", 5002);
+var bookingHost  = builder.Configuration["Gateway:BookingHost"]  ?? "localhost";
+var bookingPort  = builder.Configuration.GetValue<int>("Gateway:BookingPort", 5003);
 
 builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
 {
@@ -29,9 +31,15 @@ builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
     // Routes[2] = /api/v1/catalog/** -> CatalogService
     ["Routes:2:DownstreamHostAndPorts:0:Host"] = catalogHost,
     ["Routes:2:DownstreamHostAndPorts:0:Port"] = catalogPort.ToString(),
-    // Routes[3] = /api/** catch-all -> Monolith
-    ["Routes:3:DownstreamHostAndPorts:0:Host"] = monolithHost,
-    ["Routes:3:DownstreamHostAndPorts:0:Port"] = monolithPort.ToString(),
+    // Routes[3] = /api/bookings -> BookingService
+    ["Routes:3:DownstreamHostAndPorts:0:Host"] = bookingHost,
+    ["Routes:3:DownstreamHostAndPorts:0:Port"] = bookingPort.ToString(),
+    // Routes[4] = /api/bookings/** -> BookingService
+    ["Routes:4:DownstreamHostAndPorts:0:Host"] = bookingHost,
+    ["Routes:4:DownstreamHostAndPorts:0:Port"] = bookingPort.ToString(),
+    // Routes[5] = /api/** catch-all -> Monolith
+    ["Routes:5:DownstreamHostAndPorts:0:Host"] = monolithHost,
+    ["Routes:5:DownstreamHostAndPorts:0:Port"] = monolithPort.ToString(),
 });
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
@@ -44,7 +52,6 @@ app.UseCors();
 
 app.Map("/health", health => health.Run(ctx =>
     ctx.Response.WriteAsJsonAsync(new { status = "OK", service = "ApiGateway" })));
-
 
 app.Use(async (context, next) =>
 {
@@ -64,7 +71,9 @@ app.Use(async (context, next) =>
             ? $"http://{authHost}:{authPort}"
             : path.StartsWith("/api/v1/catalog")
                 ? $"http://{catalogHost}:{catalogPort}"
-                : $"http://{monolithHost}:{monolithPort}";
+                : path.StartsWith("/api/bookings")
+                    ? $"http://{bookingHost}:{bookingPort}"
+                    : $"http://{monolithHost}:{monolithPort}";
 
         app.Logger.LogInformation("{Method} {Path} -> {Target}; {Status}; {Ms}ms [cid:{CId}]",
             context.Request.Method, path, target,

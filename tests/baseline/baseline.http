@@ -1,0 +1,87 @@
+### Налаштування змінних (для перевірки моноліту :5100, сервісу :5003 або шлюзу :5000)
+@baseUrl = http://localhost:5000
+@authUrl = http://localhost:5001
+
+### 0. Отримання JWT токена власника (User 1 / Admin)
+# @name loginOwner
+POST {{authUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@sportsbooking.com",
+  "password": "Admin123!"
+}
+
+###
+@token = {{loginOwner.response.body.accessToken}}
+
+### 1. Створення бронювання з коректними даними (201 Created)
+POST {{baseUrl}}/api/bookings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "venueId": 1,
+  "startTime": "2027-05-10T14:00:00Z",
+  "hours": 2
+}
+
+### 2. Створення бронювання без токена (401 Unauthorized)
+POST {{baseUrl}}/api/bookings
+Content-Type: application/json
+
+{
+  "venueId": 1,
+  "startTime": "2027-05-10T14:00:00Z",
+  "hours": 2
+}
+
+### 3. Створення бронювання з неіснуючим VenueId (400 Bad Request)
+POST {{baseUrl}}/api/bookings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "venueId": 999,
+  "startTime": "2027-05-11T14:00:00Z",
+  "hours": 2
+}
+
+### 4. Створення з порушенням бізнес-правила — дата в минулому (400 Bad Request)
+POST {{baseUrl}}/api/bookings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "venueId": 1,
+  "startTime": "2020-01-01T10:00:00Z",
+  "hours": 2
+}
+
+### 5. Повтор запиту з тим самим Idempotency-Key (201 Created, той самий Id)
+POST {{baseUrl}}/api/bookings
+Authorization: Bearer {{token}}
+Idempotency-Key: idem-key-demo-001
+Content-Type: application/json
+
+{
+  "venueId": 2,
+  "startTime": "2027-05-12T16:00:00Z",
+  "hours": 3
+}
+
+### 6. Отримання своєї операції (200 OK)
+GET {{baseUrl}}/api/bookings/1
+Authorization: Bearer {{token}}
+
+### 7. Спроба отримати чужу або неіснуючу операцію (404 Not Found)
+GET {{baseUrl}}/api/bookings/9999
+Authorization: Bearer {{token}}
+
+### 8. Скасування операції (200 OK -> повторне скасування 400 Bad Request)
+POST {{baseUrl}}/api/bookings/5/cancel
+Authorization: Bearer {{token}}
+
+### 10. Список своїх бронювань з пагінацією та фільтром за статусом (200 OK)
+GET {{baseUrl}}/api/bookings?page=1&pageSize=10&status=Confirmed
+Authorization: Bearer {{token}}
