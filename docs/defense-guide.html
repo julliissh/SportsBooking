@@ -241,9 +241,18 @@
   <div class="step-title">Крок А. Авторизація в Swagger (отримати і вставити токен)</div>
   <p>Оскільки всі операції захищені атрибутом <code>[Authorize]</code>, спочатку треба авторизуватися:</p>
   <ol>
-    <li>Отримайте токен адміністратора, виконавши команду в терміналі (або у Swagger AuthService <code>:5001</code>):
-      <pre>Invoke-RestMethod http://localhost:5001/api/v1/auth/login -Method POST -ContentType 'application/json' -Body '{"email":"admin@sportsbooking.com","password":"Admin123!"}'</pre>
-      Скопіюйте довгий рядок <code>accessToken</code> із відповіді.
+    <li><strong>Отримайте токен прямо у Swagger AuthService:</strong>
+      <ol type="a">
+        <li>Відкрийте у сусідній вкладці браузера: <strong><a href="http://localhost:5001/swagger">http://localhost:5001/swagger</a></strong></li>
+        <li>Розкрийте блок <strong>POST /api/v1/auth/login</strong> і натисніть кнопку <strong>Try it out</strong>.</li>
+        <li>У віконце Request body вставте логін і пароль:
+<pre>{
+  "email": "admin@sportsbooking.com",
+  "password": "Admin123!"
+}</pre>
+        </li>
+        <li>Натисніть кнопку <strong>Execute</strong>. Нижче у блоці <em>Response body</em> виділіть і скопіюйте довгий текст <code>accessToken</code> (без лапок).</li>
+      </ol>
     </li>
     <li>У Swagger BookingService (<code>:5003/swagger</code>) вгорі праворуч натисніть зелену кнопку <strong>Authorize 🔓</strong>.</li>
     <li>У полі <em>Value</em> вставте ваш токен:
