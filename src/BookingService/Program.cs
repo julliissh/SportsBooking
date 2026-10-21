@@ -123,11 +123,8 @@ app.Use(async (context, next) =>
     }
 });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 // Health check: перевіряє і власну БД, і доступність CatalogService
 app.MapGet("/health", async (BookingDbContext db, ICatalogClient catalogClient, CancellationToken ct) =>

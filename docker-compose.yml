@@ -25,6 +25,7 @@ services:
     ports:
       - "5001:5001"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_auth;User=root;Password=${MYSQL_ROOT_PASSWORD:-292929}
       Jwt__Key: ${JWT_KEY:-super-secret-key-min-32-bytes-long!!}
       Jwt__Issuer: SportsBookingAuth
@@ -42,6 +43,7 @@ services:
     ports:
       - "5002:5002"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_catalog;User=root;Password=${MYSQL_ROOT_PASSWORD:-292929}
       Jwt__Key: ${JWT_KEY:-super-secret-key-min-32-bytes-long!!}
       Jwt__Issuer: SportsBookingAuth
@@ -59,6 +61,7 @@ services:
     ports:
       - "5003:5003"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_booking;User=root;Password=${MYSQL_ROOT_PASSWORD:-292929}
       Services__CatalogUrl: http://catalog-service:5002
       Jwt__Key: ${JWT_KEY:-super-secret-key-min-32-bytes-long!!}
@@ -79,6 +82,7 @@ services:
     ports:
       - "5000:5000"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       Gateway__AuthHost: auth-service
       Gateway__AuthPort: 5001
       Gateway__CatalogHost: catalog-service
