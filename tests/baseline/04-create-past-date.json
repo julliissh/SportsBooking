@@ -1,0 +1,1 @@
+{"title":"One or more validation errors occurred.","status":400,"errors":{"StartTime":["Дата та час початку бронювання не можуть бути в минулому."]}}
