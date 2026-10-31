@@ -1,0 +1,160 @@
+### ==============================================================================
+### Лабораторна робота №3 — Сценарії для демонстрації викладачу (Порядок перевірки)
+### Шлюз API Gateway: http://localhost:5000 (єдина точка входу)
+### ==============================================================================
+
+@gatewayUrl = http://localhost:5000
+@adminEmail = admin@sportsbooking.com
+@adminPassword = Admin123!
+
+### ------------------------------------------------------------------------------
+### 0. Автентифікація та отримання токенів для двох різних користувачів
+### ------------------------------------------------------------------------------
+
+# @name loginAdmin
+POST {{gatewayUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
+}
+
+###
+@tokenUser1 = {{loginAdmin.response.body.accessToken}}
+
+# Реєстрація другого користувача (якщо ще не створений) та вхід для перевірки ізоляції персональних даних
+POST {{gatewayUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "user2@sportsbooking.com",
+  "password": "{{adminPassword}}",
+  "displayName": "Second User"
+}
+
+###
+# @name loginUser2
+POST {{gatewayUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user2@sportsbooking.com",
+  "password": "{{adminPassword}}"
+}
+
+###
+@tokenUser2 = {{loginUser2.response.body.accessToken}}
+
+
+### ==============================================================================
+### Крок 1 (Порядок перевірки). Складений ендпоінт: один запит клієнта замість двох
+### ==============================================================================
+### Викликається паралельно (Task.WhenAll):
+### 1) CatalogService -> інформація про майданчик
+### 2) BookingService -> власне активне бронювання поточного користувача
+### Шлюз об'єднує дані у власний DTO VenueDetailsAggDto
+GET {{gatewayUrl}}/api/gateway/venues/1/details
+Authorization: Bearer {{tokenUser1}}
+Accept: application/json
+
+
+### ==============================================================================
+### Крок 2 (Порядок перевірки). Зупиняєте один сервіс — шлюз не зависає, відповідь свідома
+### ==============================================================================
+### Тест 2а: Складений ендпоінт без токена -> 401 Unauthorized у форматі ProblemDetails
+### У сервіси запити навіть не йдуть.
+GET {{gatewayUrl}}/api/gateway/venues/1/details
+Accept: application/json
+
+### Тест 2б: Неіснуючий майданчик -> 404 Not Found у форматі ProblemDetails
+GET {{gatewayUrl}}/api/gateway/venues/999/details
+Authorization: Bearer {{tokenUser1}}
+Accept: application/json
+
+### (При зупинці BookingService шлюз повертає 200 OK з даними каталогу і status: "unavailable")
+### (При зупинці CatalogService шлюз повертає 503 Service Unavailable у форматі ProblemDetails)
+
+
+### ==============================================================================
+### Крок 3 (Порядок перевірки). Звертаєтеся напряму на порт сервісу — доступу немає
+### ==============================================================================
+### У Docker Compose порти 5001 (Auth), 5002 (Catalog), 5003 (Booking) оголошені через expose,
+### тому прямий виклик з хоста блокується (Connection refused):
+# GET http://localhost:5002/api/v1/catalog/items
+# GET http://localhost:5003/api/bookings
+
+
+### ==============================================================================
+### Крок 4 (Порядок перевірки). Кешування каталогу (спільні дані)
+### ==============================================================================
+### 1-й запит: MISS (дані беруться з сервісу, кешуються на 30 секунд)
+GET {{gatewayUrl}}/api/v1/catalog/items
+Accept: application/json
+
+### 2-й запит: HIT (відповідь миттєво віддається з пам'яті шлюзу, без виклику CatalogService)
+GET {{gatewayUrl}}/api/v1/catalog/items
+Accept: application/json
+
+### Перевірка метрик кешу (лічильники влучань і промахів)
+GET {{gatewayUrl}}/health/cache-stats
+Accept: application/json
+
+
+### ==============================================================================
+### Крок 5 (Порядок перевірки). Інвалідизація кешу після зміни даних
+### ==============================================================================
+### Оновлення об'єкта в каталозі викликає автоматичну інвалідацію кешу каталогу
+PUT {{gatewayUrl}}/api/v1/catalog/items/1
+Authorization: Bearer {{tokenUser1}}
+Content-Type: application/json
+
+{
+  "name": "Central Football Field (Updated)",
+  "address": "Main St 1",
+  "pricePerHour": 550.00,
+  "category": "Football"
+}
+
+### Наступний GET одразу отримує свіже значення з CatalogService (X-Cache: MISS)
+GET {{gatewayUrl}}/api/v1/catalog/items
+Accept: application/json
+
+
+### ==============================================================================
+### Крок 6 (Порядок перевірки). Персональні дані не кешуються (два різні користувачі)
+### ==============================================================================
+### Користувач 1 бачить лише свої бронювання
+GET {{gatewayUrl}}/api/gateway/venues/1/details
+Authorization: Bearer {{tokenUser1}}
+Accept: application/json
+
+### Користувач 2 бачить лише свої дані (не отримує бронювання користувача 1 з кешу!)
+GET {{gatewayUrl}}/api/gateway/venues/1/details
+Authorization: Bearer {{tokenUser2}}
+Accept: application/json
+
+
+### ==============================================================================
+### Крок 7 (Порядок перевірки). Rate Limiting: перевищення ліміту -> 429 з Retry-After
+### ==============================================================================
+### Відправте кілька швидких повторних POST на логін або створення бронювання.
+### Шлюз повертає:
+### HTTP/1.1 429 Too Many Requests
+### Retry-After: 60
+### Content-Type: application/problem+json
+POST {{gatewayUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "bruteforce@test.com",
+  "password": "wrong"
+}
+
+
+### ==============================================================================
+### Службові ендпоінти шлюзу
+### ==============================================================================
+### Перевірка здоров'я всіх мікросервісів через шлюз
+GET {{gatewayUrl}}/health
+Accept: application/json

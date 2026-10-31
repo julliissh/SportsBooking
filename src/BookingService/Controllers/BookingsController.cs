@@ -90,6 +90,19 @@ public class BookingsController : ControllerBase
         return ToActionResult(result);
     }
 
+    [HttpGet("my-active")]
+    [ProducesResponseType<BookingResponseDto>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetMyActive(
+        [FromQuery] int venueId,
+        CancellationToken ct = default)
+    {
+        var userId = GetCurrentUserId();
+        var dto = await _bookingService.GetActiveForVenueAsync(userId, venueId, ct);
+        return dto is null ? NoContent() : Ok(dto);
+    }
+
     /// <summary>
     /// Створити нове бронювання спортивного майданчика.
     /// Перевіряє існування майданчика у CatalogService (з таймаутом 2 с) та підтримує заголовок Idempotency-Key.

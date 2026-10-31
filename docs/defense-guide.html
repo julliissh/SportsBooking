@@ -2,50 +2,58 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Гайд до захисту Лабораторної роботи №2</title>
+<title>Гайд до захисту Лабораторної роботи №3</title>
 <style>
   @page {
     size: A4;
-    margin: 12mm 12mm 12mm 12mm;
+    margin: 10mm 12mm 10mm 12mm;
   }
   body {
     font-family: 'Segoe UI', Arial, sans-serif;
     color: #24292f;
-    line-height: 1.45;
-    font-size: 12.5px;
+    line-height: 1.42;
+    font-size: 11.5px;
     margin: 0;
     padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   h1 {
-    font-size: 21px;
+    font-size: 20px;
     color: #0969da;
     border-bottom: 2px solid #0969da;
     padding-bottom: 5px;
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   h2 {
-    font-size: 15px;
+    font-size: 14.5px;
     color: #1f2328;
     background: #f6f8fa;
     border-left: 4px solid #0969da;
-    padding: 5px 10px;
-    margin-top: 16px;
-    margin-bottom: 8px;
+    padding: 4px 10px;
+    margin-top: 12px;
+    margin-bottom: 6px;
   }
   h3 {
-    font-size: 13.5px;
+    font-size: 12.5px;
     color: #0969da;
-    margin-top: 12px;
-    margin-bottom: 4px;
+    margin-top: 8px;
+    margin-bottom: 3px;
   }
   p, li {
-    font-size: 12px;
+    font-size: 11px;
+  }
+  p {
+    margin: 3px 0;
   }
   ul, ol {
-    margin-top: 3px;
-    margin-bottom: 6px;
+    margin-top: 2px;
+    margin-bottom: 5px;
     padding-left: 18px;
+  }
+  li {
+    margin-bottom: 2px;
   }
   .badge {
     display: inline-block;
@@ -63,9 +71,9 @@
     background: #ddf4ff;
     border: 1px solid #54aeff;
     border-radius: 6px;
-    padding: 7px 10px;
-    margin: 8px 0;
-    font-size: 11.5px;
+    padding: 6px 10px;
+    margin: 6px 0;
+    font-size: 11px;
   }
   .callout-warning {
     background: #fff8c5;
@@ -78,13 +86,14 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: 6px 0;
-    font-size: 11px;
+    margin: 5px 0;
+    font-size: 10.5px;
   }
   th, td {
     border: 1px solid #d0d7de;
-    padding: 5px 7px;
+    padding: 4px 6px;
     text-align: left;
+    vertical-align: top;
   }
   th {
     background: #f6f8fa;
@@ -95,49 +104,79 @@
     padding: 1px 4px;
     border-radius: 4px;
     font-family: Consolas, monospace;
-    font-size: 11px;
+    font-size: 10.5px;
     color: #cf222e;
   }
   pre {
     background: #f6f8fa;
     border: 1px solid #d0d7de;
     border-radius: 5px;
-    padding: 6px 8px;
+    padding: 5px 8px;
     font-family: Consolas, monospace;
-    font-size: 10.5px;
-    margin: 5px 0;
-    line-height: 1.35;
+    font-size: 10px;
+    margin: 4px 0;
+    line-height: 1.32;
+    white-space: pre-wrap;
   }
   .step-box {
     background: #ffffff;
     border: 1px solid #d0d7de;
     border-radius: 6px;
-    padding: 8px 10px;
-    margin-bottom: 8px;
+    padding: 6px 10px;
+    margin-bottom: 7px;
+    page-break-inside: avoid;
   }
   .step-title {
     font-weight: 700;
     color: #0969da;
-    margin-bottom: 4px;
-    font-size: 12.5px;
+    margin-bottom: 3px;
+    font-size: 12px;
+  }
+  .code-card {
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-left: 4px solid #8250df;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    page-break-inside: avoid;
+  }
+  .code-card-title {
+    font-weight: 700;
+    color: #8250df;
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+  .meta-line {
+    font-size: 10.5px;
+    color: #57606a;
+    margin-bottom: 3px;
+  }
+  .explain-box {
+    background: #f6f8fa;
+    border-left: 3px solid #2da44e;
+    padding: 4px 8px;
+    margin-top: 4px;
+    font-size: 10.5px;
   }
   .qa-box {
     background: #fcfcfc;
     border: 1px solid #e1e4e8;
     border-left: 3px solid #0969da;
     border-radius: 4px;
-    padding: 6px 9px;
-    margin-bottom: 6px;
+    padding: 5px 8px;
+    margin-bottom: 5px;
+    page-break-inside: avoid;
   }
   .qa-q {
     font-weight: 700;
     color: #1f2328;
-    margin-bottom: 3px;
-    font-size: 11.5px;
+    margin-bottom: 2px;
+    font-size: 11px;
   }
   .qa-a {
     color: #333;
-    font-size: 11.5px;
+    font-size: 10.8px;
   }
   .page-break {
     page-break-after: always;
@@ -146,297 +185,602 @@
 </head>
 <body>
 
-<h1>Лабораторна робота №2 — Повний гайд до захисту</h1>
+<h1>Лабораторна робота №3 — Повний гайд до захисту</h1>
 <p style="margin-bottom: 6px;">
   <strong>Предметна область:</strong> SportsBooking (Бронювання спортивних майданчиків)<br>
-  <strong>Оцінка:</strong> <span class="badge">10 / 10 обов'язкових балів</span> + <span class="badge badge-bonus">+3 бали за Docker Compose</span> = <strong>13 балів</strong>
+  <strong>Склад системи:</strong> <span class="badge">API Gateway (порт 5000)</span> + <span class="badge badge-bonus">Auth + Catalog + Booking у Docker Compose</span>
 </p>
 
 <div class="callout callout-success">
-  <strong>Суть роботи:</strong> Ми винесли операційний модуль бронювань із моноліту в окремий незалежний мікросервіс <code>BookingService</code> (порт <code>5003</code>, окрема БД <code>miniproject_booking</code>), прибрали зовнішні ключі між базами, додали перевірку каталогу з таймаутом 2 с, захистили створення ідемпотентністю (<code>Idempotency-Key</code>), зберегли знімок цін (<code>ItemSnapshot</code>), перемкнули шлюз <code>ApiGateway</code> (:5000) і довели 10 інтеграційними тестами (<code>dotnet test</code>), що система працює без регресій.
+  <strong>Суть роботи:</strong> Ми перетворили шлюз <code>ApiGateway</code> (порт <code>5000</code>) із простого маршрутизатора, зробленого в ЛР1–2, на <strong>єдині захищені вхідні двері системи без бізнес-логіки</strong>: додали складений ендпоінт екрана деталей майданчика (паралельний виклик <code>CatalogService</code> + <code>BookingService</code> через <code>Task.WhenAll</code>), задали таймаути 2 с зі свідомою обробкою збоїв (часткова відповідь <code>"unavailable"</code> або <code>503 ProblemDetails</code>), перенесли перевірку JWT-токена на шлюз із примусовим видаленням підроблених <code>X-User-Id</code>, закрили зовнішні порти сервісів у Docker (<code>expose</code>), підключили кеш <code>IMemoryCache</code> (TTL 30 с) для спільних даних каталогу з миттєвою інвалідизацією при змінах, налаштували <code>Rate Limiting</code> (<code>429</code> + <code>Retry-After</code>) і довели роботу <strong>18 інтеграційними тестами</strong>.
+</div>
+
+<div class="callout">
+  <strong>🗣️ 30 секунд, щоб відкрити розмову з викладачем (прочитай на початку захисту):</strong><br>
+  <em>«Шлюз на 5000 — єдині вхідні двері. Складений запит паралельно бере майданчик із Catalog і мою активну бронь із Booking. Таймаут — 2 с. Якщо Booking не відповів, шлюз віддає 200 і статус <code>unavailable</code>, а якщо Catalog — то 503. Токен перевіряється на шлюзі, клієнтські заголовки <code>X-User-Id</code> примусово стираються. Порти внутрішніх сервісів у Docker закриті через <code>expose</code>. Кеш увімкнено лише для каталогу, ключ без користувача, TTL 30 с, скидається миттєво після PUT/POST/DELETE. Ліміти: логін — 10/хв за IP, бронь — 10/хв за юзером, загальний — 100/хв, анонім — 30/хв. Тести: 18 зелених».</em>
 </div>
 
 <h2>Розділ 1. Карта коду — куди дивитися і що показувати</h2>
 <table>
   <thead>
     <tr>
-      <th>Функціонал</th>
-      <th>Файл у проєкті</th>
-      <th>Що саме показати викладачу</th>
+      <th style="width: 19%;">Функціонал</th>
+      <th style="width: 39%;">Файл у проєкті</th>
+      <th style="width: 42%;">Що саме показати викладачу</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><strong>Контролер</strong></td>
+      <td><strong>Складений ендпоінт</strong></td>
+      <td><code>src/ApiGateway/Controllers/VenueDetailsController.cs</code></td>
+      <td>Маршрут <code>GET /api/gateway/venues/{venueId}/details</code>, паралельний виклик <code>await Task.WhenAll(venueTask, bookingTask)</code>, обробка 404/503/unavailable.</td>
+    </tr>
+    <tr>
+      <td><strong>Власний DTO шлюзу</strong></td>
+      <td><code>src/ApiGateway/Dtos/VenueDetailsDtos.cs</code></td>
+      <td><code>VenueDetailsAggDto(Venue, MyActiveBooking, BookingStatus)</code> — формат екрана клієнта, який належить шлюзу, та статус <code>GwStatus</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Клієнти шлюзу + таймаут 2 с</strong></td>
+      <td><code>src/ApiGateway/Clients/CatalogGwClient.cs</code><br><code>src/ApiGateway/Clients/BookingGwClient.cs</code></td>
+      <td>У <code>Program.cs</code> (рядки 205–221): <code>client.Timeout = TimeSpan.FromSeconds(2)</code>; у клієнтах перехоплення <code>TaskCanceledException</code> &rarr; <code>GwStatus.Unavailable</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Ендпоінт активної броні</strong></td>
       <td><code>src/BookingService/Controllers/BookingsController.cs</code></td>
-      <td>Маршрути <code>/api/bookings</code>, атрибут <code>[Authorize]</code>, <code>UserId</code> витягується з токена (не з тіла).</td>
+      <td>Новий метод <code>GET /api/bookings/my-active?venueId=...</code> (рядки 93–104): повертає <code>200 OK</code> з бронюванням або <code>204 NoContent</code>, якщо броні немає.</td>
     </tr>
     <tr>
-      <td><strong>Бізнес-логіка</strong></td>
-      <td><code>src/BookingService/Services/BookingServiceImpl.cs</code></td>
-      <td>Метод <code>ValidateBusinessRules</code> (дата в майбутньому, години 1..24), перевірка перетину слотів, ідемпотентність.</td>
+      <td><strong>Перевірка JWT і захист X-User-Id</strong></td>
+      <td><code>src/ApiGateway/Program.cs</code> (рядки 88–124, 305–326)</td>
+      <td><code>AddJwtBearer</code> на шлюзі. Рядки 307–308: <code>Headers.Remove("X-User-Id")</code> стирає підробку клієнта і підставляє справжній <code>sub</code> з перевіреного токена.</td>
     </tr>
     <tr>
-      <td><strong>Клієнт каталогу (таймаут 2 с)</strong></td>
-      <td><code>src/BookingService/Clients/CatalogClient.cs</code></td>
-      <td>Дедлайн <code>timeoutCts.CancelAfter(TimeSpan.FromSeconds(2))</code>, 3 випадки помилок: 404, таймаут, недоступність.</td>
-    </tr>
-    <tr>
-      <td><strong>База даних та індекси</strong></td>
-      <td><code>src/BookingService/Data/BookingDbContext.cs</code></td>
-      <td><code>HasPrecision(10,2)</code>, статус рядком <code>HasConversion&lt;string&gt;()</code>, унікальний індекс на <code>IdempotencyKey</code>, відсутність FK.</td>
-    </tr>
-    <tr>
-      <td><strong>Міграція та автоінкремент</strong></td>
-      <td><code>src/BookingService/Migrations/20261019174922_InitialCreate.cs</code></td>
-      <td>Рядок 84: <code>migrationBuilder.Sql("ALTER TABLE Bookings AUTO_INCREMENT = 100;");</code> та перенесення старих записів 1, 3, 4.</td>
-    </tr>
-    <tr>
-      <td><strong>Обробка помилок</strong></td>
-      <td><code>src/BookingService/Infrastructure/GlobalExceptionHandler.cs</code></td>
-      <td>Реалізація <code>IExceptionHandler</code>: клієнт бачить <code>ProblemDetails</code> без витоку stack trace.</td>
-    </tr>
-    <tr>
-      <td><strong>Шлюз Ocelot</strong></td>
-      <td><code>src/ApiGateway/ocelot.json</code></td>
-      <td>Маршрут <code>/api/bookings/{everything}</code> перемкнено на порт <code>5003</code> замість 5100.</td>
-    </tr>
-    <tr>
-      <td><strong>10 тестів</strong></td>
-      <td><code>tests/BookingService.IntegrationTests/BookingIntegrationTests.cs</code></td>
-      <td>Всі 10 тестів <code>Scenario01_...</code> до <code>Scenario10_...</code>, перевірка статус-коду та тіла JSON.</td>
-    </tr>
-    <tr>
-      <td><strong>Стаб каталогу</strong></td>
-      <td><code>tests/BookingService.IntegrationTests/ApiFactory.cs</code></td>
-      <td><code>FakeCatalogClient</code>, тестова база <code>miniproject_booking_test</code>, генерація тестових JWT токенів.</td>
-    </tr>
-    <tr>
-      <td><strong>Baseline знімок</strong></td>
-      <td><code>tests/baseline/baseline.http</code></td>
-      <td>Запити до моноліту та збережені файли відповідей у <code>tests/baseline/</code>.</td>
-    </tr>
-    <tr>
-      <td><strong>ADR-0003</strong></td>
-      <td><code>docs/adr/0003-operations-extraction.md</code></td>
-      <td>Таблиця «наші дані / чужі дані / технічна дрібниця» та обґрунтування винесення.</td>
-    </tr>
-    <tr>
-      <td><strong>Порівняння</strong></td>
-      <td><code>docs/baseline-diff.md</code></td>
-      <td>Таблиця порівняння «Було / Стало» для всіх 10 сценаріїв — доказ відсутності регресій.</td>
-    </tr>
-    <tr>
-      <td><strong>Docker Compose (+3 бали)</strong></td>
+      <td><strong>Закриті порти сервісів</strong></td>
       <td><code>docker-compose.yml</code></td>
-      <td>Підняття однією командою MySQL (порт 3307), Auth (5001), Catalog (5002), Booking (5003), Gateway (5000).</td>
+      <td>У сервісів <code>auth</code> (5001), <code>catalog</code> (5002), <code>booking</code> (5003) стоїть <code>expose</code> замість <code>ports</code>. Назовні відкритий тільки шлюз <code>5000:5000</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Кеш каталогу + інвалідизація</strong></td>
+      <td><code>src/ApiGateway/Middleware/CatalogCacheMiddleware.cs</code><br><code>src/ApiGateway/Services/CatalogCacheService.cs</code></td>
+      <td>Кешується лише спільний <code>GET /api/v1/catalog/**</code> (TTL 30 с, ключ без юзера, <code>X-Cache: HIT/MISS</code>). При <code>POST/PUT/DELETE</code> викликається <code>Invalidate()</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Rate Limiting (429)</strong></td>
+      <td><code>src/ApiGateway/Program.cs</code> (рядки 134–199)</td>
+      <td>Логін: 10/хв за IP; Бронь: 10/хв за <code>userId</code>; Загальний: 100/хв за <code>userId</code>, анонім: 30/хв за IP. Відповідь <code>429</code> + заголовок <code>Retry-After</code> (секунди до кінця вікна) + <code>ProblemDetails</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Єдиний ProblemDetails</strong></td>
+      <td><code>src/ApiGateway/Middleware/GatewayProblemDetailsMiddleware.cs</code></td>
+      <td>Уніфікація всіх помилок шлюзу (401, 404, 429, 503, таймаути) у стандарт RFC 7807 (<code>application/problem+json</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>Health check + метрики кешу</strong></td>
+      <td><code>src/ApiGateway/Program.cs</code> (рядки 356–389)</td>
+      <td><code>GET /health</code> (паралельно опитує всі 3 сервіси &rarr; 200 OK або 503 Degraded) та <code>GET /health/cache-stats</code> (лічильники <code>hits</code> і <code>misses</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>18 тестів шлюзу</strong></td>
+      <td><code>tests/ApiGateway.IntegrationTests/GatewayTests.cs</code><br><code>tests/ApiGateway.IntegrationTests/RateLimitTests.cs</code></td>
+      <td>18 інтеграційних тестів (<code>Scenario11</code>–<code>Scenario20</code>), які покривають усі 6 обов'язкових сценаріїв таблиці з розділу 7 методички.</td>
+    </tr>
+    <tr>
+      <td><strong>ADR-0004 та ADR-0005</strong></td>
+      <td><code>docs/adr/0004-gateway-cache-and-rate-limiting.md</code><br><code>docs/adr/0005-composite-request-venue-details.md</code></td>
+      <td>Архітектурні рішення щодо складу ключа кешу, TTL, алгоритмів лімітування та часткової відмови складеного запиту.</td>
     </tr>
   </tbody>
 </table>
 
-<h2>Розділ 2. Що конкретно вводити в Swagger (Покроковий приклад)</h2>
-<p>Відкрийте в браузері: <strong><a href="http://localhost:5003/swagger">http://localhost:5003/swagger</a></strong></p>
+<h2>Розділ 2. Розбір коду ЛР3: де змінили, на що, як працює і навіщо</h2>
+
+<div class="code-card">
+  <div class="code-card-title">1. Складений ендпоінт і паралельний виклик (Task.WhenAll)</div>
+  <div class="meta-line">
+    <strong>Де лежить:</strong> <code>src/ApiGateway/Controllers/VenueDetailsController.cs</code> (рядки 123–168)<br>
+    <strong>Що змінили порівняно з ЛР2:</strong> У ЛР2 шлюз вміє лише тупо пересилати запити через Ocelot. Ми додали власний контролер шлюзу, який сам паралельно звертається до двох сервісів і склеює екран для клієнта.
+  </div>
+<pre>// 1. Запускаємо обидва виклики ОДНОЧАСНО (не чекаємо завершення першого перед стартом другого!)
+var venueTask = _catalogClient.GetVenueAsync(venueId, correlationId, ct);
+var bookingTask = _bookingClient.GetMyActiveAsync(venueId, userId, bearerToken, correlationId, ct);
+
+await Task.WhenAll(venueTask, bookingTask); // Чекаємо, поки обидва завершаться паралельно
+
+var venueResult = venueTask.Result;
+var bookingResult = bookingTask.Result;
+
+// 2. Якщо майданчика з таким ID взагалі немає в каталозі -> повертаємо 404 ProblemDetails
+if (venueResult.Status == GwStatus.NotFound)
+    return NotFound(new ProblemDetails { Status = 404, Title = "Venue not found", Detail = $"Venue {venueId} not found." });
+
+// 3. ПОВНА ВІДМОВА: якщо впав головний сервіс (CatalogService) -> повертаємо 503 ProblemDetails на весь запит
+if (venueResult.Status == GwStatus.Unavailable)
+    return StatusCode(503, new ProblemDetails { Status = 503, Title = "Catalog service unavailable" });
+
+// 4. ЧАСТКОВА ВІДПОВІДЬ: якщо впав другорядний сервіс (BookingService) -> віддаємо майданчик, але явно пишемо "unavailable"
+var bookingStatus = bookingResult.Status switch {
+    GwStatus.Ok          =&gt; "active",      // Активна бронь знайдена
+    GwStatus.NotFound    =&gt; "none",        // Сервіс відповів, що активної броні у юзера немає (204 NoContent)
+    GwStatus.Unavailable =&gt; "unavailable", // Сервіс бронювань лежить або перевищив таймаут 2 с!
+    _ =&gt; "none"
+};
+
+return Ok(new VenueDetailsAggDto(Venue: venueResult.Data!, MyActiveBooking: bookingResult.Data, BookingStatus: bookingStatus));</pre>
+  <div class="explain-box">
+    <strong>Пояснення простими словами (навіщо і як працює):</strong>
+    <ul>
+      <li><strong>Навіщо <code>Task.WhenAll</code>:</strong> Обидва запити летять по мережі одночасно. Якщо Catalog відповідає за 150 мс, а Booking за 200 мс, то клієнт чекатиме лише <strong>200 мс</strong> (за найдовшим), а не 350 мс (якби викликали по черзі через два окремі <code>await</code>).</li>
+      <li><strong>Навіщо поле <code>bookingStatus</code>:</strong> Викладач вимагає, щоб клієнт відрізняв «даних немає» (<code>"none"</code>) від «сервіс впав» (<code>"unavailable"</code>). Якби ми мовчки повертали <code>null</code>, клієнт подумав би, що його бронювання не існує, і створив би друге таке саме!</li>
+    </ul>
+  </div>
+</div>
+
+<div class="code-card">
+  <div class="code-card-title">2. Таймаути (2 с) та клієнти шлюзу</div>
+  <div class="meta-line">
+    <strong>Де лежить:</strong> <code>src/ApiGateway/Program.cs</code> (рядки 205–221) та <code>src/ApiGateway/Clients/CatalogGwClient.cs</code> (рядки 45–88)<br>
+    <strong>Що змінили порівняно з ЛР2:</strong> Додали жорсткий дедлайн 2 секунди на всі вихідні <code>HttpClient</code> шлюзу та в <code>ocelot.json</code> (<code>"TimeoutValue": 2000</code>).
+  </div>
+<pre>// У Program.cs реєструємо типізовані клієнти з таймаутом 2 секунди:
+builder.Services.AddHttpClient&lt;ICatalogGwClient, CatalogGwClient&gt;(client =&gt; {
+    client.BaseAddress = new Uri(catalogUrl);
+    client.Timeout = TimeSpan.FromSeconds(2); // Якщо сервіс думає довше 2 с — виклик примусово обірветься!
+});
+
+// У CatalogGwClient.cs (і так само в BookingGwClient.cs) ловимо обрив за таймаутом або помилку мережі:
+try {
+    using var response = await _http.SendAsync(request, ct);
+    if (response.StatusCode == HttpStatusCode.NotFound) return new GwResult&lt;VenueDto&gt;(GwStatus.NotFound);
+    if (!response.IsSuccessStatusCode) return new GwResult&lt;VenueDto&gt;(GwStatus.Unavailable);
+    ...
+}
+catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or TimeoutException) {
+    _logger.LogError(ex, "CatalogService unavailable for venue {VenueId}", venueId);
+    return new GwResult&lt;VenueDto&gt;(GwStatus.Unavailable); // Не валимо шлюз, а повертаємо статус Unavailable!
+}</pre>
+  <div class="explain-box">
+    <strong>Пояснення простими словами:</strong> Коли один із сервісів зависає довше ніж на 2 секунди, <code>HttpClient</code> викидає <code>TaskCanceledException</code>. Наш блок <code>catch</code> ловить її і спокійно повертає статус <code>GwStatus.Unavailable</code>. Завдяки цьому потоки шлюзу не блокуються назавжди і шлюз ніколи не падає разом із завислим сервісом.
+  </div>
+</div>
+
+<div class="code-card">
+  <div class="code-card-title">3. Перевірка JWT-токена на шлюзі та захист від підробки X-User-Id</div>
+  <div class="meta-line">
+    <strong>Де лежить:</strong> <code>src/ApiGateway/Program.cs</code> (рядки 88–123 та 303–326) + <code>docker-compose.yml</code><br>
+    <strong>Що змінили порівняно з ЛР2:</strong> У ЛР2 шлюз не перевіряв токен сам. Тепер шлюз валідує JWT на вході, видаляє підроблені клієнтом заголовки <code>X-User-Id</code> і записує туди справжній ID із токена. А в <code>docker-compose.yml</code> порти сервісів закрили через <code>expose</code>.
+  </div>
+<pre>app.UseAuthentication(); // 1. Шлюз перевіряє підпис, термін дії та видавця JWT-токена
+
+app.Use(async (context, next) =&gt;
+{
+    // 2. ЗАХИСТ: Примусово стираємо заголовки X-User-Id та X-User-Roles, які міг підсунути хитрий клієнт!
+    context.Request.Headers.Remove("X-User-Id");
+    context.Request.Headers.Remove("X-User-Roles");
+
+    // 3. Якщо користувач пройшов перевірку токена — витягуємо його справжній ID з клейма "sub"
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        var uid = context.User.FindFirstValue("sub") ?? context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!string.IsNullOrWhiteSpace(uid))
+            context.Request.Headers["X-User-Id"] = uid; // Передаємо вниз перевірений ID!
+    }
+    await next();
+});</pre>
+  <div class="explain-box">
+    <strong>Пояснення простими словами:</strong> Чому це критично важливо? Якби ми не робили <code>Headers.Remove("X-User-Id")</code>, будь-хто ззовні міг би надіслати запит із заголовком <code>X-User-Id: 1</code> і вкрасти дані адміністратора. А оскільки ми стираємо клієнтський заголовок і закрили порти сервісів (<code>expose: 5001, 5002, 5003</code> у Docker), ніхто не може обійти шлюз напряму.
+  </div>
+</div>
+
+<div class="code-card">
+  <div class="code-card-title">4. Локальний кеш каталогу (IMemoryCache) та миттєва інвалідизація при змінах</div>
+  <div class="meta-line">
+    <strong>Де лежить:</strong> <code>src/ApiGateway/Middleware/CatalogCacheMiddleware.cs</code> та <code>src/ApiGateway/Services/CatalogCacheService.cs</code><br>
+    <strong>Що додали в ЛР3:</strong> Кешування спільних даних каталогу на 30 секунд і скидання кешу після <code>POST/PUT/DELETE</code>.
+  </div>
+<pre>public async Task InvokeAsync(HttpContext context)
+{
+    // 1. ПРАВИЛО БЕЗПЕКИ: Кешуємо ТІЛЬКИ спільний каталог (/api/v1/catalog). Персональні маршрути проходять повз!
+    if (!context.Request.Path.StartsWithSegments("/api/v1/catalog")) {
+        await _next(context);
+        return;
+    }
+
+    // 2. ІНВАЛІДИЗАЦІЯ: Якщо адмін змінює каталог (POST, PUT, DELETE) і сервіс відповів успіхом (200..299)
+    var method = context.Request.Method;
+    if (HttpMethods.IsPost(method) || HttpMethods.IsPut(method) || HttpMethods.IsDelete(method)) {
+        await _next(context);
+        if (context.Response.StatusCode &gt;= 200 &amp;&amp; context.Response.StatusCode &lt; 300)
+            _cacheService.Invalidate(); // Миттєво скидає весь кеш каталогу через CancellationTokenSource.Cancel()!
+        return;
+    }
+
+    // 3. Будуємо ключ кешу БЕЗ користувача: "GET:/api/v1/catalog/items?category=Football&amp;page=1"
+    var cacheKey = BuildCacheKey(context.Request);
+    if (_cache.TryGetValue(cacheKey, out CachedHttpResponse? cached) &amp;&amp; cached is not null) {
+        _cacheService.RecordHit();
+        context.Response.Headers["X-Cache"] = "HIT"; // Віддаємо миттєво з RAM шлюзу без виклику сервісу!
+        await context.Response.Body.WriteAsync(cached.Body);
+        return;
+    }
+
+    // 4. Якщо в кеші немає (MISS) — викликаємо сервіс і кладемо відповідь у кеш на 30 секунд (TTL)
+    _cacheService.RecordMiss();
+    ...
+    var entryOptions = new MemoryCacheEntryOptions()
+        .SetAbsoluteExpiration(TimeSpan.FromSeconds(30))          // TTL = 30 секунд
+        .AddExpirationToken(_cacheService.GetExpirationToken());  // Прив'язка до токена скидання!
+    _cache.Set(cacheKey, toCache, entryOptions);
+    context.Response.Headers["X-Cache"] = "MISS";
+}</pre>
+  <div class="explain-box">
+    <strong>Пояснення простими словами:</strong>
+    <ul>
+      <li><strong>Що кешуємо:</strong> Тільки <code>/api/v1/catalog</code>, бо список спортивних майданчиків однаковий для всіх людей. Мої бронювання (<code>/api/bookings</code>) і мій профіль (<code>/api/v1/users</code>) <strong>не кешуються взагалі</strong>, щоб один користувач ніколи не побачив чужу бронь!</li>
+      <li><strong>Як працює інвалідизація:</strong> Всі записи в кеші прив'язані до одного «стоп-крана» (<code>CancellationChangeToken</code> у <code>CatalogCacheService</code>). Коли адмін змінює ціну майданчика через <code>PUT</code>, шлюз смикає метод <code>Invalidate()</code>, який натискає цей стоп-кран — і всі старі записи миттєво зникають із пам'яті, не чекаючи 30 секунд!</li>
+    </ul>
+  </div>
+</div>
+
+<div class="code-card">
+  <div class="code-card-title">5. Обмеження частоти запитів (Rate Limiting) — захист від спаму і підбору паролів</div>
+  <div class="meta-line">
+    <strong>Де лежить:</strong> <code>src/ApiGateway/Program.cs</code> (рядки 127–199)<br>
+    <strong>Що додали в ЛР3:</strong> Вбудований <code>Microsoft.AspNetCore.RateLimiting</code> з розділенням лімітів та відповіддю <code>429</code>.
+  </div>
+<pre>builder.Services.AddRateLimiter(options =&gt;
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = PartitionedRateLimiter.Create&lt;HttpContext, string&gt;(ctx =&gt;
+    {
+        var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "anon";
+        var uid = ctx.User.FindFirstValue("sub"); // ID авторизованого користувача з токена
+
+        // 1. Вхід у систему (POST /api/v1/auth/login) — жорсткий ліміт 10 спроб/хв за IP (захист від підбору паролів)
+        if (HttpMethods.IsPost(ctx.Request.Method) &amp;&amp; path.StartsWithSegments("/api/v1/auth/login"))
+            return RateLimitPartition.GetFixedWindowLimiter($"login:{ip}", _ =&gt; FixedOpt(10));
+
+        // 2. Створення бронювань (POST /api/bookings) — 10 запитів/хв за ID юзера
+        if (HttpMethods.IsPost(ctx.Request.Method) &amp;&amp; path.StartsWithSegments("/api/bookings"))
+            return RateLimitPartition.GetFixedWindowLimiter($"book:user:{uid ?? ip}", _ =&gt; FixedOpt(10));
+
+        // 3. Авторизований юзер — 100 запитів/хв за його UserId; Анонім — 30 запитів/хв за IP
+        return uid is not null
+            ? RateLimitPartition.GetFixedWindowLimiter($"general:user:{uid}", _ =&gt; FixedOpt(100))
+            : RateLimitPartition.GetFixedWindowLimiter($"general:ip:{ip}", _ =&gt; FixedOpt(30));
+    });
+
+    // Коли ліміт перевищено — беремо з лічильника скільки секунд лишилось до кінця вікна (або запасне 60)
+    options.OnRejected = async (ctx, ct) =&gt; {
+        ctx.HttpContext.Response.Headers.RetryAfter =
+            ctx.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter)
+                ? ((int)retryAfter.TotalSeconds).ToString() : "60";
+        await ctx.HttpContext.Response.WriteAsJsonAsync(new ProblemDetails {
+            Status = 429, Title = "Too Many Requests", Detail = "Rate limit exceeded. Please retry later."
+        }, ct);
+    };
+});</pre>
+  <div class="explain-box">
+    <strong>Пояснення простими словами:</strong> Чому авторизованих рахуємо за <code>uid</code> (<code>general:user:5</code>), а анонімів за <code>ip</code> (<code>general:ip:192.168.1.1</code>)? Тому що в офісі чи університеті за однією IP-адресою Wi-Fi сидить сотня студентів. Якщо рахувати авторизованих за IP, один спамер заблокує роботу всім іншим. А коли кожен має свій ліміт за <code>userId</code>, страждає лише сам порушник. Заголовок <code>Retry-After</code> показує, скільки секунд залишилося до кінця поточного хвилинного вікна (наприклад, <code>37</code>).
+  </div>
+</div>
+
+<div class="code-card">
+  <div class="code-card-title">6. Закриті порти в docker-compose.yml, таймаути в ocelot.json та видалення секретів</div>
+  <div class="meta-line">
+    <strong>Де лежить:</strong> <code>docker-compose.yml</code>, <code>src/ApiGateway/ocelot.json</code>, <code>src/BookingService/Controllers/BookingsController.cs</code> та всі <code>appsettings.json</code>
+  </div>
+<pre># 1. У docker-compose.yml: внутрішні сервіси мають expose (закриті ззовні!), а ports є ТІЛЬКИ у шлюзу:
+  catalog-service:
+    expose:
+      - "5002"          # Доступний ЛИШЕ всередині мережі Docker (з хоста http://localhost:5002 не відкриється!)
+  booking-service:
+    expose:
+      - "5003"          # Доступний ЛИШЕ всередині мережі Docker
+  api-gateway:
+    ports:
+      - "5000:5000"     # ЄДИНІ вхідні двері назовні!
+
+// 2. В ocelot.json: на кожному маршруті додано QoSOptions з таймаутом 2000 мс (2 секунди):
+"QoSOptions": { "ExceptionsAllowedBeforeBreaking": 3, "DurationOfBreak": 5000, "TimeoutValue": 2000 }
+
+// 3. У BookingsController.cs додали метод для складеного запиту шлюзу:
+[HttpGet("my-active")]
+public async Task&lt;IActionResult&gt; GetMyActive([FromQuery] int venueId, CancellationToken ct = default) {
+    var userId = GetCurrentUserId(); // Беремо ID суворо з токена, а не з параметрів!
+    var dto = await _bookingService.GetActiveForVenueAsync(userId, venueId, ct);
+    return dto is null ? NoContent() : Ok(dto); // 204 якщо броні немає, 200 якщо є
+}
+
+// 4. У всіх appsettings.json прибрали секретний ключ (Вимога 6.5: жодних секретів у репозиторії!):
+"Jwt": { "Key": "", "Issuer": "SportsBookingAuth", "Audience": "SportsBookingClients" }</pre>
+  <div class="explain-box">
+    <strong>Пояснення простими словами:</strong> Завдяки <code>expose</code> у Docker клієнт фізично не може підключитися до портів <code>5001</code>, <code>5002</code> чи <code>5003</code> в обхід шлюзу. А порожній <code>"Key": ""</code> в <code>appsettings.json</code> гарантує, що в Git-репозиторії немає жодного пароля чи секрету (вони підтягуються з <code>.env</code>).
+  </div>
+</div>
+
+<h2>Розділ 3. Команди для консолі Docker та робота зі Swagger</h2>
+
+<div class="step-box" style="border-left: 4px solid #2da44e;">
+  <div class="step-title">Крок 0. Усі команди для термінала (як запустити, зупинити і перевірити Docker)</div>
+  <p style="margin-bottom: 4px;">Відкрийте термінал у папці <code>d:\навчання\dotnetLAB\SportsBooking</code> і використовуйте ці команди:</p>
+<pre># 1. Запустити всі контейнери у фоні (перед початком показу):
+docker compose up -d
+
+# 2. Перевірити, що всі 5 контейнерів працюють (має писати Up):
+docker ps
+
+# 3. ЗУПИНИТИ сервіс бронювань з консолі (для Дії 2 — показати часткову відповідь "unavailable"):
+docker stop sportsbooking-booking
+
+# 4. УВІМКНУТИ сервіс бронювань назад у консолі (після Дії 2):
+docker start sportsbooking-booking
+
+# 5. (Якщо викладач попросить) Зупинити каталог — щоб показати 503 ProblemDetails (повну відмову):
+docker stop sportsbooking-catalog
+# І одразу повернути назад:
+docker start sportsbooking-catalog
+
+# 6. Подивитися логи каталогу (для Дії 4 — довести, що при X-Cache: HIT запит до сервісу не доходить):
+docker logs sportsbooking-catalog --tail 20</pre>
+</div>
+
+<p>Відкрийте в браузері єдиний Swagger шлюзу: <strong><a href="http://localhost:5000/swagger/index.html">http://localhost:5000/swagger/index.html</a></strong></p>
 
 <div class="step-box">
   <div class="step-title">Крок А. Авторизація в Swagger (отримати і вставити токен)</div>
-  <p>Оскільки всі операції захищені атрибутом <code>[Authorize]</code>, спочатку треба авторизуватися:</p>
   <ol>
-    <li><strong>Отримайте токен прямо у Swagger AuthService:</strong>
-      <ol type="a">
-        <li>Відкрийте у сусідній вкладці браузера: <strong><a href="http://localhost:5001/swagger">http://localhost:5001/swagger</a></strong></li>
-        <li>Розкрийте блок <strong>POST /api/v1/auth/login</strong> і натисніть кнопку <strong>Try it out</strong>.</li>
-        <li>У віконце Request body вставте логін і пароль:
+    <li>У Swagger шлюзу (<code>http://localhost:5000/swagger/index.html</code>) розкрийте зелений блок <strong>POST /api/v1/auth/login</strong>, натисніть <strong>Try it out</strong> і <strong>Execute</strong>:
 <pre>{
   "email": "admin@sportsbooking.com",
   "password": "Admin123!"
 }</pre>
-        </li>
-        <li>Натисніть кнопку <strong>Execute</strong>. Нижче у блоці <em>Response body</em> виділіть і скопіюйте довгий текст <code>accessToken</code> (без лапок).</li>
-      </ol>
     </li>
-    <li>У Swagger BookingService (<code>:5003/swagger</code>) вгорі праворуч натисніть зелену кнопку <strong>Authorize 🔓</strong>.</li>
-    <li>У полі <em>Value</em> вставте ваш токен:
-      <pre>Bearer ВСТАВИТИ_ВАШ_ТОКЕН_СЮДИ</pre>
-      (або просто сам токен без слова Bearer) і натисніть кнопку <strong>Authorize</strong>, а потім <strong>Close</strong>. Замок закриється 🔒.
-    </li>
+    <li>Скопіюйте отриманий <code>accessToken</code> (без лапок).</li>
+    <li>У Swagger шлюзу вгорі праворуч натисніть зелену кнопку <strong>Authorize 🔓</strong>, вставте токен у поле <em>Value</em> і натисніть <strong>Authorize</strong> &rarr; <strong>Close</strong>. Замок закриється 🔒.</li>
   </ol>
 </div>
 
 <div class="step-box">
-  <div class="step-title">Крок Б. Створення нового бронювання (POST /api/bookings)</div>
+  <div class="step-title">Крок Б. Виклик складеного ендпоінта (GET /api/gateway/venues/{venueId}/details)</div>
   <ol>
-    <li>Розкрийте зелений блок <strong>POST /api/bookings</strong>.</li>
-    <li>Натисніть кнопку <strong>Try it out</strong> праворуч.</li>
-    <li>У полі <em>Request body</em> вставте такий готовий JSON:
+    <li>Розкрийте синій блок <strong>GET /api/gateway/venues/{venueId}/details</strong> і натисніть <strong>Try it out</strong>.</li>
+    <li>У полі <code>venueId</code> введіть <code>1</code> і натисніть синю кнопку <strong>Execute</strong>.</li>
+    <li><strong>Результат:</strong> статус <code>200 OK</code>. Шлюз паралельно опитав 2 сервіси і повернув єдиний JSON екрана:
 <pre>{
-  "venueId": 1,
-  "startTime": "2027-05-10T14:00:00Z",
-  "hours": 2
+  "venue": {
+    "id": 1,
+    "name": "Olympic Arena",
+    "address": "вул. Спортивна, 1",
+    "pricePerHour": 450.00,
+    "category": "Multipurpose"
+  },
+  "myActiveBooking": {
+    "id": 101,
+    "venueId": 1,
+    "startTime": "2027-06-01T10:00:00Z",
+    "hours": 2,
+    "totalPrice": 900.00,
+    "status": "Confirmed"
+  },
+  "bookingStatus": "active"
 }</pre>
     </li>
-    <li>(Опціонально) У полі заголовка <code>Idempotency-Key</code> можна написати <code>demo-key-1</code>.</li>
-    <li>Натисніть велику синю кнопку <strong>Execute</strong>.</li>
-    <li><strong>Результат:</strong> статус <code>201 Created</code>, у відповіді повернеться бронювання з <code>id</code> (наприклад, 100), збереженим знімком майданчика <code>"venueName": "Central Football Field"</code> та порахованою сумою <code>"totalPrice": 1000.00</code>.</li>
   </ol>
 </div>
 
-<div class="step-box">
-  <div class="step-title">Крок В. Перегляд списку своїх бронювань (GET /api/bookings)</div>
-  <ol>
-    <li>Розкрийте синій блок <strong>GET /api/bookings</strong>.</li>
-    <li>Натисніть <strong>Try it out</strong>.</li>
-    <li>Параметри можна залишити за замовчуванням (<code>page: 1</code>, <code>pageSize: 20</code>, або ввести <code>status: Confirmed</code>).</li>
-    <li>Натисніть <strong>Execute</strong>.</li>
-    <li><strong>Результат:</strong> статус <code>200 OK</code> і JSON зі списком ваших бронювань та пагінацією.</li>
-  </ol>
+<div class="step-box" style="border-left: 4px solid #8250df;">
+  <div class="step-title">Крок В. Як викликати наживо кожен із 5 прикладів у Swagger (якщо викладач попросить)</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">Яку відповідь хоче бачити викладач</th>
+        <th style="width: 70%;">Що конкретно натиснути у Swagger і терміналі</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Успішна відповідь (200 OK)<br><code>"bookingStatus": "active"</code></strong><br><em>(або <code>"none"</code> без броні)</em></td>
+        <td>У блоці <code>GET /api/gateway/venues/{venueId}/details</code> введіть <code>venueId = 1</code> і натисніть <strong>Execute</strong> &rarr; поверне майданчик №1 і активне бронювання зі статусом <code>"active"</code>.<br><em>(Якщо ввести <code>venueId = 3</code>, де броні немає &rarr; поверне <code>"myActiveBooking": null, "bookingStatus": "none"</code>).</em></td>
+      </tr>
+      <tr>
+        <td><strong>2. Часткова деградація (200 OK)<br><code>"bookingStatus": "unavailable"</code></strong></td>
+        <td>1) У терміналі виконайте: <code>docker stop sportsbooking-booking</code><br>2) У Swagger введіть <code>venueId = 1</code> і натисніть <strong>Execute</strong> &rarr; виведе <code>200 OK</code>, майданчик є, а внизу <code>"myActiveBooking": null, "bookingStatus": "unavailable"</code>.<br>3) Увімкніть назад: <code>docker start sportsbooking-booking</code></td>
+      </tr>
+      <tr>
+        <td><strong>3. Повна відмова (503 Service Unavailable)<br><code>Catalog service unavailable</code></strong></td>
+        <td>1) У терміналі виконайте: <code>docker stop sportsbooking-catalog</code><br>2) У Swagger введіть <code>venueId = 2</code> (щоб не взяло №1 із кешу!) і натисніть <strong>Execute</strong> &rarr; виведе <code>503 ProblemDetails</code> (<code>"title": "Catalog service unavailable"</code>).<br>3) Увімкніть назад: <code>docker start sportsbooking-catalog</code></td>
+      </tr>
+      <tr>
+        <td><strong>4. Майданчик не знайдено (404 Not Found)<br><code>Venue not found</code></strong></td>
+        <td>Нічого зупиняти не треба! Просто у Swagger у поле <code>venueId</code> введіть неіснуючий номер <strong><code>999</code></strong> і натисніть <strong>Execute</strong> &rarr; одразу виведе <code>404 Not Found</code> у форматі <code>ProblemDetails</code> (<code>"detail": "Venue with id 999 was not found in catalog."</code>).</td>
+      </tr>
+      <tr>
+        <td><strong>5. Перевищення ліміту (429 Too Many Requests)<br><code>Too Many Requests</code></strong></td>
+        <td>У Swagger відкрийте блок <code>POST /api/v1/auth/login</code> (де ліміт = 10 запитів на хвилину) і швидко натисніть синю кнопку <strong>Execute 11 разів поспіль</strong> &rarr; на 11-й раз виведе <code>429 Too Many Requests</code> із заголовком <code>retry-after</code> та <code>ProblemDetails</code>!</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
-<div class="step-box">
-  <div class="step-title">Крок Г. Скасування бронювання (POST /api/bookings/{id}/cancel)</div>
-  <ol>
-    <li>Розкрийте блок <strong>POST /api/bookings/{id}/cancel</strong>.</li>
-    <li>Натисніть <strong>Try it out</strong>.</li>
-    <li>Введіть <code>id</code> вашого щойно створеного бронювання (наприклад, <code>100</code>).</li>
-    <li>Натисніть <strong>Execute</strong>.</li>
-    <li><strong>Результат:</strong> статус <code>200 OK</code>, статус бронювання змінився на <code>"status": "Cancelled"</code>.</li>
-    <li>Якщо натиснути <strong>Execute</strong> ще раз — повернеться помилка <code>400 Bad Request</code> («Бронювання вже скасовано»).</li>
-  </ol>
-</div>
-
-<div class="page-break"></div>
-
-<h2>Розділ 3. Покроковий план захисту (7 дій перед викладачем)</h2>
+<h2>Розділ 4. Покроковий план захисту в Swagger (8 дій перед викладачем за Розділом 9 методички)</h2>
+<p>Усе виконується прямо в браузері у Swagger шлюзу: <strong><code>http://localhost:5000/swagger/index.html</code></strong></p>
 
 <div class="step-box">
-  <div class="step-title">Дія 1. Показати tests/baseline/ та історію комітів у Git</div>
+  <div class="step-title">Дія 1. Показати складений ендпоінт: один запит клієнта замість двох</div>
   <ul>
-    <li>Покажіть файл <code>tests/baseline/baseline.http</code> та збережені JSON-відповіді моноліту.</li>
-    <li>У GitHub Desktop покажіть вкладку <strong>History</strong> — перший коміт зафіксував baseline до коду сервісу.</li>
-    <li><strong>Фраза для викладача:</strong> <em>«Спочатку ми зафіксували базову поведінку (baseline) моноліту, щоб мати еталон для порівняння, і лише після цього виносили код нового сервісу».</em></li>
+    <li>У Swagger відкрийте синій блок <strong>GET /api/gateway/venues/{venueId}/details</strong>, введіть <code>venueId = 1</code> і натисніть <strong>Execute</strong>.</li>
+    <li>Покажіть викладачу у відповіді об'єкт <code>venue</code> (з каталогу) та <code>myActiveBooking</code> (з бронювань).</li>
+    <li><strong>Фраза для викладача:</strong> <em>«Клієнт робить лише один запит на порт 5000. Шлюз паралельно через Task.WhenAll викликає CatalogService і BookingService та збирає відповідь у власний DTO шлюзу VenueDetailsAggDto».</em></li>
   </ul>
 </div>
 
 <div class="step-box">
-  <div class="step-title">Дія 2. Підняти систему і показати власну БД з перенесеними даними</div>
+  <div class="step-title">Дія 2. Зупинити один сервіс — показати, що шлюз не зависає, а відповідь свідома</div>
   <ul>
-    <li>Покажіть запущений Docker Desktop (група <code>sportsbooking</code> горить зеленим) або виконайте:
-      <pre>docker compose up -d</pre>
+    <li><strong>Як зупинити в консолі:</strong> виконайте в терміналі:
+      <pre>docker stop sportsbooking-booking</pre>
     </li>
-    <li>Покажіть таблицю в MySQL (через Workbench або команду в консолі):
-      <pre>& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" -u root -p292929 -e "SELECT Id, VenueName, PricePerHour, TotalPrice, Status FROM miniproject_booking.Bookings;"</pre>
+    <li>У Swagger знову натисніть <strong>Execute</strong> у блоці <strong>GET /api/gateway/venues/{venueId}/details</strong> (де <code>venueId = 1</code>).</li>
+    <li><strong>Результат:</strong> з'єднання відхиляється миттєво (за мілісекунди), повертається <code>200 OK</code>, картка майданчика на місці, а внизу написано: <code>"myActiveBooking": null, "bookingStatus": "unavailable"</code>.</li>
+    <li><strong>Фраза для викладача:</strong> <em>«Сервіс вимкнено, тож відмова миттєва. А таймаут 2 с захищає від завислого сервісу, який мовчить — це перевіряє тест <code>Scenario12b</code>. Оскільки головна частина екрана (майданчик) є, ми віддаємо часткову відповідь і явно позначаємо статус бронювання як <code>unavailable</code>, щоб клієнт не подумав, ніби броні немає, і не створив дублікат. Якщо ж зупинити CatalogService (<code>docker stop sportsbooking-catalog</code>) — шлюз поверне 503 ProblemDetails (повна відмова)».</em></li>
+    <li><strong>Як увімкнути назад у консолі:</strong> виконайте в терміналі:
+      <pre>docker start sportsbooking-booking</pre>
     </li>
-    <li><strong>Фраза для викладача:</strong> <em>«BookingService має власну базу miniproject_booking. Старі записи з моноліту (Id 1, 3, 4) перенесені міграцією, а AUTO_INCREMENT піднято до 100, тому нові записи не перезапишуть старі».</em></li>
   </ul>
 </div>
 
 <div class="step-box">
-  <div class="step-title">Дія 3. Запустити тести (dotnet test) і показати «злам логіки»</div>
+  <div class="step-title">Дія 3. Звернутися напряму на порт сервісу в обхід шлюзу — доступу немає!</div>
+  <ul>
+    <li>Відкрийте нову вкладку в браузері і вставте пряму адресу каталогу (порт <code>5002</code> замість <code>5000</code>): <code>http://localhost:5002/api/v1/catalog/items</code>.</li>
+    <li><strong>Результат:</strong> браузер покаже помилку з'єднання (<code>ERR_CONNECTION_REFUSED</code> — «Немає зв'язку із сайтом»).</li>
+    <li><strong>Фраза для викладача:</strong> <em>«У docker-compose.yml для Auth, Catalog і Booking ми використали expose замість ports. Їхні порти 5001–5003 відкриті лише всередині ізольованої мережі Docker для шлюзу. Назовні торчить тільки порт 5000, тому ніхто не може обійти шлюз і підробити заголовок X-User-Id».</em></li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 4. Повторити запит до каталогу — показати роботу кешу (MISS &rarr; HIT)</div>
+  <ul>
+    <li>У Swagger відкрийте блок <strong>GET /api/v1/catalog/items</strong> &rarr; натисніть <strong>Try it out &rarr; Execute</strong> вперше &rarr; внизу в блоці <em>Response headers</em> покажіть <code>x-cache: MISS</code>.</li>
+    <li>Натисніть <strong>Execute</strong> вдруге &rarr; у <em>Response headers</em> тепер написано <code>x-cache: HIT</code>!</li>
+    <li>У Swagger відкрийте блок <strong>GET /health/cache-stats</strong> &rarr; натисніть <strong>Try it out &rarr; Execute</strong> &rarr; покажіть, що лічильник <code>hits</code> виріс.</li>
+    <li><strong>Фраза для викладача:</strong> <em>«Публічний каталог спільний для всіх, тому ми кешуємо його в IMemoryCache з TTL 30 секунд. Другий запит віддається з оперативної пам'яті шлюзу без звернення до CatalogService».</em></li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 5. Змінити дані в каталозі — показати миттєве скидання кешу (інвалідизацію)</div>
+  <ul>
+    <li>У Swagger відкрийте помаранчевий блок <strong>PUT /api/v1/catalog/items/{id}</strong> &rarr; натисніть <strong>Try it out</strong> (там уже підставлено <code>id = 1</code> і нову ціну <code>550</code>) &rarr; натисніть <strong>Execute</strong>.</li>
+    <li>Одразу (не чекаючи 30 секунд!) поверніться до блоку <strong>GET /api/v1/catalog/items</strong> і натисніть <strong>Execute</strong>.</li>
+    <li><strong>Результат:</strong> заголовок знову <code>x-cache: MISS</code>, і в списку одразу видно нову ціну <code>550</code>!</li>
+    <li><strong>Фраза для викладача:</strong> <em>«Після успішного PUT/POST/DELETE шлюз автоматично викликає Invalidate() через CancellationChangeToken, тому застаріла ціна миттєво видаляється з кешу».</em></li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 6. Показати, що персональні дані НЕ кешуються (два користувачі, той самий маршрут)</div>
+  <ul>
+    <li>З токеном першого юзера (<code>admin@sportsbooking.com</code>) у блоці <strong>GET /api/gateway/venues/{venueId}/details</strong> (<code>venueId = 1</code>) натисніть <strong>Execute</strong> &rarr; бачимо його бронювання (<code>"bookingStatus": "active"</code>).</li>
+    <li>У блоці <strong>POST /api/v1/auth/login</strong> замініть email на другого юзера: <code>"email": "user2@sportsbooking.com"</code> (пароль той самий: <code>"Admin123!"</code>) &rarr; натисніть <strong>Execute</strong> &rarr; скопіюйте новий <code>accessToken</code>.</li>
+    <li>Натисніть вгорі праворуч кнопку <strong>Authorize 🔒 &rarr; Logout</strong>, вставте токен другого юзера &rarr; <strong>Authorize &rarr; Close</strong>.</li>
+    <li>Знову натисніть <strong>Execute</strong> у блоці <strong>GET /api/gateway/venues/{venueId}/details</strong> (<code>venueId = 1</code>) &rarr; другий користувач бачить <code>"myActiveBooking": null, "bookingStatus": "none"</code> (не отримує бронювання першого юзера з кешу!).</li>
+    <li><strong>Фраза для викладача:</strong> <em>«Спільний майданчик береться з кешу, а персональне бронювання кожного разу запитується наживо для конкретного UserId з токена. Персональні дані не кешуються ні повністю, ні частково».</em></li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 7. Перевищити ліміт запитів — показати 429 з Retry-After</div>
+  <ul>
+    <li>У Swagger у блоці <strong>POST /api/v1/auth/login</strong> швидко натисніть синю кнопку <strong>Execute 11 разів поспіль</strong>.</li>
+    <li><strong>Результат:</strong> статус <code>429 Too Many Requests</code>, заголовок <code>Retry-After</code> (наприклад, <code>37</code> — скільки секунд лишилось до кінця вікна; <code>60</code> є лише запасним) та тіло у форматі <code>ProblemDetails</code>.</li>
+    <li><strong>Фраза для викладача:</strong> <em>«Retry-After показує, скільки секунд лишилось до кінця поточного хвилинного вікна».</em></li>
+  </ul>
+</div>
+
+<div class="step-box">
+  <div class="step-title">Дія 8. Запустити тести (dotnet test) і показати «злам логіки»</div>
   <ul>
     <li>Виконайте в терміналі:
       <pre>dotnet test</pre>
-      Результат: <code>Passed! - Failed: 0, Passed: 10, Skipped: 0</code> (10 із 10 тестів зелені).
+      Результат: <code>Passed! - Failed: 0, Passed: 18, Skipped: 0</code> (усі 18 тестів шлюзу зелені).
     </li>
-    <li><strong>Якщо викладач скаже: «Зламай рядок і покажи, що тест червоніє»:</strong>
+    <li><strong>Якщо викладач скаже: «Зламай рядок у коді й покажи, що тест червоніє» (3 готові варіанти):</strong>
       <ol>
-        <li>У файлі <code>src/BookingService/Services/BookingServiceImpl.cs</code> (рядок 268) тимчасово закоментуйте рядок:
-          <br><code>// if (startUtc &lt;= DateTime.UtcNow)</code>
-        </li>
-        <li>Запустіть <code>dotnet test</code> &rarr; тест <code>Scenario04</code> впаде червоним.</li>
-        <li>Розкоментуйте рядок назад &rarr; тести знову зелені. Це залізобетонний доказ якості тестів.</li>
+        <li><strong>Зламати захист заголовка X-User-Id:</strong> у <code>src/ApiGateway/Program.cs</code> (рядок 307) закоментуйте:<br>
+          <code>// context.Request.Headers.Remove("X-User-Id");</code> &rarr; запустіть <code>dotnet test</code> &rarr; тест <code>Scenario20_ClientSupplied_UserHeaders_AreStrippedAndOverwritten</code> впаде червоним!</li>
+        <li><strong>Зламати скидання кешу:</strong> у <code>src/ApiGateway/Middleware/CatalogCacheMiddleware.cs</code> (рядок 49) закоментуйте:<br>
+          <code>// _cacheService.Invalidate();</code> &rarr; запустіть <code>dotnet test</code> &rarr; тест <code>Scenario16b_CatalogCache_MutationInvalidatesCache_SubsequentGetHitsDownstream</code> впаде червоним!</li>
+        <li><strong>Зламати часткову відповідь:</strong> у <code>src/ApiGateway/Controllers/VenueDetailsController.cs</code> (рядок 159) змініть <code>"unavailable"</code> на <code>"none"</code> &rarr; тест <code>Scenario13_CompositeRequest_WhenBookingUnavailable_Returns200WithUnavailableStatus</code> впаде червоним! Розкоментуйте/поверніть назад — тести знову зелені.</li>
       </ol>
     </li>
   </ul>
 </div>
 
-<div class="step-box">
-  <div class="step-title">Дія 4. Виконати запити через шлюз (порт 5000)</div>
-  <ul>
-    <li>У файлі <code>tests/baseline/baseline.http</code> натискайте кнопки <strong>Send Request</strong> навпроти запитів. Запити проходять через <code>http://localhost:5000</code>.</li>
-    <li>Покажіть файл <code>docs/baseline-diff.md</code> — відповіді шлюзу повністю збігаються з монолітом.</li>
-  </ul>
-</div>
-
-<div class="step-box">
-  <div class="step-title">Дія 5. Зупинити CatalogService і показати відмовостійкість (503 помилка)</div>
-  <ul>
-    <li>У Docker Desktop натисніть кнопку <strong>Stop</strong> (квадратик) на контейнері <code>sportsbooking-catalog</code>.</li>
-    <li>У Swagger або через `baseline.http` надішліть створення бронювання.</li>
-    <li><strong>Результат:</strong> через рівно 2 секунди (наш дедлайн) сервіс не падає, а повертає свідомий:
-      <br><code>503 Service Unavailable: "Сервіс каталогу недоступний"</code>.
-    </li>
-    <li><strong>Фраза для викладача:</strong> <em>«Завдяки таймауту у 2 секунди в CatalogClient потік не зависає назавжди, система не падає, а повертає коректний 503 код».</em></li>
-    <li>Запустіть контейнер <code>sportsbooking-catalog</code> назад.</li>
-  </ul>
-</div>
-
-<div class="step-box">
-  <div class="step-title">Дія 6. Показати Swagger UI</div>
-  <ul>
-    <li>Відкрийте <code>http://localhost:5003/swagger</code> — покажіть описи, коди відповідей 200/201/400/401/404/503 та кнопку Authorize.</li>
-  </ul>
-</div>
-
-<div class="page-break"></div>
-
-<h2>Розділ 4. Готові відповіді на ВСІ 11 контрольних питань (Розділ 14)</h2>
+<h2>Розділ 5. Готові відповіді на ВСІ 11 контрольних питань + 3 каверзні питання</h2>
 
 <div class="qa-box">
-  <div class="qa-q">1. Що таке шов (seam) і за якими ознаками ви його шукали у своєму моноліті?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Шов — це межа в моноліті, де його можна розрізати без зміни коду інших частин. Ми поділили сутності моноліту на три групи: <em>наші дані</em> (Bookings — перенесли у власну БД), <em>чужі дані</em> (Venues, Users — читаємо по мережі або з JWT) та <em>спільні дрібниці</em> (статуси — здублювали локально в сервісі).</div>
+  <div class="qa-q">1. Що таке API Gateway і за що він відповідає?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Це єдині вхідні двері системи для зовнішніх клієнтів (порт 5000). Він відповідає за маршрутизацію запитів до мікросервісів, одноразову перевірку JWT-токена, обмеження частоти запитів (Rate Limiting), кешування спільних публічних даних, встановлення таймаутів та збирання одного екрана з кількох сервісів (складений запит).</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">2. Чому між базами різних сервісів не роблять зовнішніх ключів? Що використовують замість них?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Мікросервіси мають бути автономними (принцип Database per Service), їхні БД можуть бути на різних серверах. Зовнішній ключ (FK) на рівні СУБД створив би жорстку залежність. Замість нього зберігають числове поле <code>VenueId</code>, перевіряють його по мережі через <code>CatalogClient</code> і фіксують знімок назви та ціни (ItemSnapshot).</div>
+  <div class="qa-q">2. Чому в шлюзі не має бути бізнес-логіки? Наведіть приклад правила, яке туди просилося, але не належить.</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Якщо перенести у шлюз бізнес-правила та розрахунки, він перетвориться на другий моноліт, через який іде весь трафік. <em>Приклад правила:</em> «Якщо бронювання триває більше 3 годин — дати знижку 15%» або «Перевірити, чи не перетинається час броні з іншими». Це правило належить суто <code>BookingService</code>, який володіє даними бронювань.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">3. Що таке характеризаційний тест і чим він відрізняється від звичайного?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Звичайний тест перевіряє код за вимогами («як має бути»). Характеризаційний тест (baseline) знімає фактичну поведінку існуючої системи («як вона відповідає сьогодні»), щоб після винесення переконатися, що жодна деталь і жоден код помилки не змінилися.</div>
+  <div class="qa-q">3. Чому виклики у складеному ендпоінті виконують паралельно? Як зміниться час відповіді, якщо зробити їх послідовно?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> При паралельному виклику через <code>Task.WhenAll</code> запити до Catalog і Booking виконуються одночасно, тому загальний час дорівнює <strong>найдовшому</strong> виклику: <code>max(T1, T2)</code> (наприклад, <code>max(200 мс, 250 мс) = 250 мс</code>). Якщо зробити їх послідовно, час складеться: <code>200 + 250 = 450 мс</code>, і клієнт чекатиме майже вдвічі довше.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">4. Чим інтеграційний тест відрізняється від модульного і від e2e-тесту?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Unit-тест перевіряє один клас в ізоляції без бази. Інтеграційний тест перевіряє конвеєр ASP.NET Core + валідацію + EF Core + тестову базу в пам'яті тестового процесу. E2E-тест перевіряє всю систему наскрізно через шлюз з реальними процесами.</div>
+  <div class="qa-q">4. Що станеться зі шлюзом, якщо прибрати таймаути, а один із сервісів зависне?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Один завислий сервіс «покладе» весь шлюз і всю систему (каскадна відмова). Запити в шлюзі накопичуватимуться, усі потоки пулу займуться нескінченним очікуванням, пам'ять вичерпається, і шлюз перестане відповідати навіть на ті маршрути, чиї сервіси працюють нормально.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">5. Для чого потрібен WebApplicationFactory і що саме ви в ньому підмінили?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Він піднімає веб-застосунок у тестовому процесі без відкриття сокетів і без <code>dotnet run</code>. Ми підмінили в ньому: 1) робочу БД на окрему тестову <code>miniproject_booking_test</code>; 2) клієнта каталогу на стаб <code>FakeCatalogClient</code> із готовими відповідями.</div>
+  <div class="qa-q">5. Чому клієнт має відрізняти «даних немає» від «сервіс недоступний»?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Якщо <code>BookingService</code> впав, а шлюз мовчки поверне <code>myActiveBooking: null</code> (так само, як коли бронювань немає), користувач подумає, що його бронювання не створилося, і натисне кнопку «Забронювати» вдруге — створить дублікат і двічі спише кошти. Тому ми явно повертаємо <code>bookingStatus: "unavailable"</code>.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">6. Що таке ідемпотентність? Наведіть ідемпотентний і неідемпотентний метод.</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Це властивість операції давати той самий результат при повторних викликах. Ідемпотентні за специфікацією: <code>GET</code>, <code>PUT</code>, <code>DELETE</code>. Неідемпотентний: <code>POST</code>. Щоб зробити наш POST ідемпотентним, ми додали заголовок <code>Idempotency-Key</code> та унікальний індекс у БД.</div>
+  <div class="qa-q">6. Чому перевірку токена винесли на шлюз? За якої умови сервіс може довіряти заголовку X-User-Id?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Щоб перевіряти токен один раз на вході й одразу відсікати неавторизовані запити (401) без навантаження на внутрішні сервіси. Сервіс може довіряти заголовку <code>X-User-Id</code> лише за двох умов: 1) до сервісу <strong>неможливо достукатися напряму ззовні</strong> в обхід шлюзу (закриті порти <code>expose</code>); 2) шлюз <strong>завжди видаляє</strong> заголовок <code>X-User-Id</code>, надісланий клієнтом, і записує туди ID сам із перевіреного токена.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">7. Навіщо виклику до сусіднього сервісу потрібен дедлайн? Що станеться без нього, якщо сусід «завис»?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Дедлайн (таймаут 2 с) обмежує час очікування. Без нього потік сервера чекатиме вічно, закінчаться вільні потоки пулу і наш сервіс теж впаде (каскадна відмова). Завдяки дедлайну ми повертаємо клієнту контрольований 503 код.</div>
+  <div class="qa-q">7. Які дані ви кешуєте і чому саме їх? Чому персональні дані не кешують?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Ми кешуємо тільки спільні публічні дані — каталог майданчиків (<code>GET /api/v1/catalog/**</code>), бо вони однакові для всіх користувачів і читаються набагато частіше, ніж змінюються. Персональні дані (мої бронювання, мій профіль) кешувати не можна: це критична вразливість безпеки, через яку один користувач може отримати з кешу чужі персональні дані.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">8. Чому в операції зберігають копію назви та ціни об’єкта каталогу, а не лише його Id?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Це патерн <strong>ItemSnapshot</strong>. Якщо через півроку в каталозі піднімуть ціну майданчика, старі бронювання клієнтів не повинні перераховуватися за новими тарифами. Знімок гарантує незмінність фінансової історії.</div>
+  <div class="qa-q">8. З чого складається ваш ключ кешу? Як ви обирали TTL?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Ключ складається з HTTP-методу, шляху маршруту та відсортованих параметрів запиту (пагінації, категорії): <code>GET:/api/v1/catalog/items?category=Football&amp;page=1</code>. Для об'єкта у клієнті: <code>venue:{venueId}</code>. Користувача в ключі немає. <strong>TTL = 30 секунд</strong> — баланс між розвантаженням бази даних при сплесках трафіку та свіжістю даних.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">9. Як ви перенесли старі дані й чому підняли автоінкремент?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Записи зі старої бази (Id 1, 3, 4) внесені в міграцію <code>InitialCreate</code> через <code>HasData</code>. Командою <code>ALTER TABLE Bookings AUTO_INCREMENT = 100</code> ми підняли стартовий номер, щоб нові Id починалися зі 100 і не перетиналися зі старими.</div>
+  <div class="qa-q">9. Навіщо потрібна інвалідизація, якщо є TTL?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Поки не спливе TTL (30 секунд), клієнти бачили б у каталозі стару ціну майданчика навіть після того, як адміністратор її змінив. Інвалідизація примусово очищує кеш одразу після успішного <code>POST/PUT/DELETE</code> через шлюз, тому клієнти бачать оновлену ціну миттєво.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">10. Що таке Strangler Fig і на якому його кроці ви зараз перебуваєте?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Це патерн поступової заміни моноліту мікросервісами через API Gateway. Ми перебуваємо на кроці, коли сервіси (Auth, Catalog, Booking) винесені, шлюз перемкнено на них, а старий моноліт залишено поруч як страховку на час перевірки.</div>
+  <div class="qa-q">10. Чим fixed window відрізняється від token bucket? Що ви обрали і чому?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> <strong>Fixed window</strong> рахує не більше <code>N</code> запитів за фіксований відрізок часу (наприклад, 10 за хвилину), але на межі хвилин може пропустити подвійний сплеск. <strong>Token bucket</strong> має «відро жетонів», яке поповнюється з постійною швидкістю і дозволяє короткі сплески трафіку. Ми обрали <code>FixedWindowLimiter</code> з розділенням квот (10/хв на логін, 10/хв на бронь, 100/хв загальний), бо він простий, передбачуваний і надійно блокує підбір паролів.</div>
 </div>
 
 <div class="qa-box">
-  <div class="qa-q">11. Як ви дізналися б, що винесення зламало поведінку, якби не було baseline-файлів?</div>
-  <div class="qa-a"><strong>Відповідь:</strong> Без baseline це помітили б лише реальні клієнти після релізу (зміна регістру JSON, зниклий 404 код, зламана валідація). Базовий знімок дозволяє автоматично виявити регресії ще під час розробки.</div>
+  <div class="qa-q">11. Чому ліміт для анонімних запитів рахують за IP, а для авторизованих — за користувачем?</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Про анонімного клієнта шлюз знає лише його IP-адресу. А для авторизованих ліміт рахують за <code>userId</code> з токена, бо за одним публічним IP (офісний NAT, університетський Wi-Fi, мобільний оператор) можуть одночасно працювати десятки чесних користувачів. Якби їх рахували за IP, один активний юзер вичерпав би ліміт і заблокував усіх інших.</div>
 </div>
 
-<p style="text-align: center; color: #57606a; margin-top: 15px; font-size: 11px;">
-  Лабораторна робота №2 • Повний захист на 10/10 + 3 бали
+<div class="qa-box" style="border-left-color: #d4a72c; background: #fffdf5;">
+  <div class="qa-q">⚠️ Каверзне питання 1: «Токен перевіряється один раз на шлюзі, а в тебе і сервіси його перевіряють?»</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Так. Шлюз перевіряє токен на вході і передає вниз сам токен та заголовок <code>X-User-Id</code>. А сервіси ще раз перевіряють підпис токена, бо мають свій <code>Jwt__Key</code>, і беруть <code>userId</code> із токена. Це захист у два шари (Defense in Depth): заголовок <code>X-User-Id</code> шлюз очищує й передає, але сервіси додатково довіряють саме токену, тож навіть якби порт випадково відкрили, підробити користувача не вийде.</div>
+</div>
+
+<div class="qa-box" style="border-left-color: #d4a72c; background: #fffdf5;">
+  <div class="qa-q">⚠️ Каверзне питання 2: «Ти кажеш, що шлюз без бізнес-логіки, а bookingStatus: "active"/"none"/"unavailable" — це не логіка?»</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Ні, це не бізнес-логіка. Це лише технічна позначка стану мережевої відповіді для екрана клієнта (є дані / немає даних / сервіс не відповів). Шлюз не вирішує, чи можна бронювати майданчик, не перевіряє перетин часу і не рахує суми чи знижки — усі ціни та бізнес-правила тримає <code>BookingService</code>.</div>
+</div>
+
+<div class="qa-box" style="border-left-color: #d4a72c; background: #fffdf5;">
+  <div class="qa-q">⚠️ Каверзне питання 3: «У Docker є monolith? Бо в ocelot.json є маршрут на порт 5100».</div>
+  <div class="qa-a"><strong>Відповідь:</strong> Ні, у <code>docker-compose.yml</code> моноліту немає. Моноліт залишено в репозиторії з попередніх лабораторних для порівняння, він запускається окремо через <code>dotnet run</code> на порту 5100. У ЛР3 в Docker працюють шлюз та 3 мікросервіси: <code>Auth</code>, <code>Catalog</code> і <code>Booking</code>.</div>
+</div>
+
+<div class="callout callout-warning" style="margin-top: 8px;">
+  <strong>✅ Чекліст перед парою:</strong>
+  <ol style="margin: 2px 0 0 18px;">
+    <li>Перевір, що в корені проєкту є файл <code>.env</code> із заповненими <code>JWT_KEY</code> та <code>MYSQL_ROOT_PASSWORD</code> (без них Docker не підніметься).</li>
+    <li>Запусти <code>dotnet test</code> і переконайся, що всі 18 тестів шлюзу зелені.</li>
+    <li>Один раз прожени кроки в Swagger (<code>http://localhost:5000/swagger/index.html</code>) по черзі.</li>
+  </ol>
+</div>
+
+<p style="text-align: center; color: #57606a; margin-top: 10px; font-size: 10.5px;">
+  Лабораторна робота №3 • SportsBooking API Gateway • Повний гайд до захисту
 </p>
 
 </body>

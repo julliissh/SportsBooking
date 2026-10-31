@@ -269,6 +269,15 @@ public class BookingServiceImpl : IBookingService
         return ServiceResult<BookingResponseDto>.Success(ToDto(booking));
     }
 
+    public async Task<BookingResponseDto?> GetActiveForVenueAsync(
+        int currentUserId,
+        int venueId,
+        CancellationToken ct = default)
+    {
+        var booking = await _repo.GetActiveForVenueAsync(currentUserId, venueId, ct);
+        return booking is null ? null : ToDto(booking);
+    }
+
     private static DateTime NormalizeUtc(DateTime dt) =>
         dt.Kind == DateTimeKind.Utc ? dt : DateTime.SpecifyKind(dt, DateTimeKind.Utc);
 

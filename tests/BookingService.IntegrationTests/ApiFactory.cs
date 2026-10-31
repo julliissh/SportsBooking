@@ -50,7 +50,7 @@ public class FakeCatalogClient : ICatalogClient
 
 public class ApiFactory : WebApplicationFactory<Program>
 {
-    public const string TestJwtKey = "super-secret-key-min-32-bytes-long!!";
+    public const string TestJwtKey = "booking-service-test-jwt-signing-key-32b!";
     public const string TestJwtIssuer = "SportsBookingAuth";
     public const string TestJwtAudience = "SportsBookingClients";
 
@@ -59,6 +59,9 @@ public class ApiFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        builder.UseSetting("Jwt:Key", TestJwtKey);
+        builder.UseSetting("Jwt:Issuer", TestJwtIssuer);
+        builder.UseSetting("Jwt:Audience", TestJwtAudience);
 
         builder.ConfigureAppConfiguration((_, config) =>
         {

@@ -26,4 +26,6 @@ public interface IBookingRepository
     Task AddAsync(Booking booking, CancellationToken ct = default);
 
     Task SaveChangesAsync(CancellationToken ct = default);
+
+    Task<Booking?> GetActiveForVenueAsync(int userId, int venueId, CancellationToken ct = default);
 }

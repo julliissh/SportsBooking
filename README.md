@@ -6,54 +6,102 @@
 
 | Сервіс | Порт / URL | База даних (MySQL) | Призначення |
 |--------|------------|---------------------|-------------|
-| **ApiGateway** | `http://localhost:5000` | — | Шлюз Ocelot, єдина точка входу, наскрізний `X-Correlation-Id` |
-| **AuthService** | `http://localhost:5001` | `miniproject_auth` | Автентифікація, користувачі, ролі, видача JWT та Refresh токенів |
-| **CatalogService** | `http://localhost:5002` | `miniproject_catalog` | Каталог спортивних майданчиків (`Venue`), категорій |
-| **BookingService** *(ЛР2)* | `http://localhost:5003` | `miniproject_booking` | Операційний сервіс бронювань (`Booking`, `ItemSnapshot`, `Idempotency-Key`) |
+| **ApiGateway** *(ЛР3)* | `http://localhost:5000` | — | Єдина публічна точка входу, складений запит, кеш каталогу, Rate Limiting, валідація JWT, наскрізний `X-Correlation-Id`, уніфікований `ProblemDetails` |
+| **AuthService** | Внутрішній (`expose: 5001`) | `miniproject_auth` | Автентифікація, користувачі, ролі, видача JWT та Refresh токенів |
+| **CatalogService** | Внутрішній (`expose: 5002`) | `miniproject_catalog` | Каталог спортивних майданчиків (`Venue`), категорій |
+| **BookingService** | Внутрішній (`expose: 5003`) | `miniproject_booking` | Операційний сервіс бронювань (`Booking`, `ItemSnapshot`, `Idempotency-Key`, `GET /my-active`) |
 | **Monolith** | `http://localhost:5100` | `SportsBooking` | Старий моноліт (залишений для порівняння на час перевірки) |
-| **Інтеграційні тести** | В пам'яті (`WebApplicationFactory`) | `miniproject_booking_test` | Ізольована тестова БД для `BookingService.IntegrationTests` |
+| **Інтеграційні тести** | В пам'яті (`WebApplicationFactory`) | `miniproject_booking_test` | Тестові проекти: `BookingService.IntegrationTests` (10 тестів) та `ApiGateway.IntegrationTests` (18 тестів) — разом 28 тестів |
 
-## Підготовка MySQL (User Secrets)
+> **Безпека портів та розмежування режимів доступу (ЛР3):**
+> - **У режимі Docker Compose (основний стенд для демонстрації викладачу):** внутрішні порти мікросервісів `5001`, `5002`, `5003` оголошені директивою `expose`, а не `ports`. Тобто вони доступні виключно всередині віртуальної мережі Docker для контейнера шлюзу `api-gateway`. Пряме звернення з хост-машини (наприклад `http://localhost:5001` чи `http://localhost:5002`) повертає відмову в підключенні (`Connection refused`), що наочно демонструє перевірку кроку 3 («доступу в обхід шлюзу немає»). Порт MySQL `3307` також прив'язано до `127.0.0.1`.
+> - **У режимі локальної розробки (`dotnet run`):** сервіси прив'язуються до loopback-інтерфейсу `127.0.0.1` (`localhost`), а не до публічного інтерфейсу `0.0.0.0`. Це захищає їх від прямого доступу з інших пристроїв локальної мережі чи інтернету.
 
-Рядки підключення з паролями не зберігаються в репозиторії — налаштуйте їх через `dotnet user-secrets`:
+---
+
+## Реалізація вимог ЛР3 (API Gateway)
+
+1. **Складений запит (Composite Request):**
+   - Ендпоінт: `GET /api/gateway/venues/{venueId}/details` (вимагає Bearer JWT токен).
+   - Одночасно та паралельно (`Task.WhenAll`) виконує два запити:
+     - `CatalogService` (`GET /api/v1/catalog/items/{venueId}`)
+     - `BookingService` (`GET /api/bookings/my-active?venueId={venueId}`)
+   - Таймаут на всі вихідні виклики: 2 секунди.
+   - Власний DTO шлюзу (`VenueDetailsAggDto`), який не є сліпим об'єднанням сервісних DTO.
+   - Три стани бронювання: `"active"`, `"none"`, `"unavailable"` (при недоступності BookingService шлюз віддає 200 OK з даними каталогу і статусом `"unavailable"` для graceful degradation; при недоступності CatalogService повертається 503 ProblemDetails).
+
+2. **Кешування та інвалідація (CatalogCacheMiddleware):**
+   - Кешуються лише спільні для всіх публічні запити `GET /api/v1/catalog/**` зі статусом 200 OK.
+   - Персональні дані користувачів (`/api/bookings`, складений запит тощо) **не кешуються**.
+   - Склад ключа кешу: `GET:{path}?{sortedQuery}` (сортовані параметри запобігають дублюванню).
+   - TTL: 30 секунд (конфігурується у `appsettings.json`).
+   - Заголовки: `X-Cache: HIT` / `X-Cache: MISS`.
+   - **Автоматична інвалідація:** при будь-яких успішних операціях зміни даних (`POST`, `PUT`, `DELETE`, `PATCH` на каталог) кеш миттєво інвалідується через `CancellationChangeToken`.
+   - Метрики: `GET /health/cache-stats` повертає лічильники влучань (`hits`) та промахів (`misses`).
+
+3. **Обмеження частоти запитів (Rate Limiting):**
+   - `POST /api/v1/auth/login` — 10 запитів/хв за IP (захист від підбору паролів).
+   - `POST /api/bookings` — 10 запитів/хв за `userId` (з клейма `sub` перевіреного токена).
+   - Загальний ліміт — 100 запитів/хв (за `userId` для авторизованих, за IP для анонімів).
+   - При перевищенні: `429 Too Many Requests` із заголовком `Retry-After` та тілом у форматі `ProblemDetails`.
+   - Службові ендпоінти `/health` та `/health/cache-stats` виключені з обмежень.
+
+4. **Безпека та єдиний вхід:**
+   - Токен перевіряється на шлюзі. Заголовки `X-User-Id` та `X-User-Roles`, що надійшли ззовні від клієнта, примусово очищуються шлюзом, після чого заповнюються перевіреними значеннями з валідованого JWT.
+   - У репозиторії **відсутні секрети**: ключ підпису JWT передається через `JWT_KEY` (.env / змінні середовища) або `dotnet user-secrets`.
+
+5. **Єдиний формат помилок `ProblemDetails` (RFC 7807):**
+   - Всі відповіді помилок шлюзу (401, 404, 429, 500, 503, 504 таймаути Ocelot) приведені до єдиного формату `ProblemDetails` з `Content-Type: application/problem+json`.
+
+---
+
+## Налаштування секретів (User Secrets та .env)
+
+### 1. Для локальної розробки (dotnet run / test)
+Ключ JWT та рядки підключення не зберігаються у файлах конфігурації репозиторію. Налаштуйте їх через `dotnet user-secrets`:
 
 ```powershell
-# AuthService
+# Встановлення JWT ключа підпису (мінімум 32 символи)
+$jwtKey = "<your-secure-32-byte-secret-key-min-256-bit>"
+dotnet user-secrets set "Jwt:Key" $jwtKey --project src/ApiGateway
+dotnet user-secrets set "Jwt:Key" $jwtKey --project src/AuthService
+dotnet user-secrets set "Jwt:Key" $jwtKey --project src/CatalogService
+dotnet user-secrets set "Jwt:Key" $jwtKey --project src/BookingService
+dotnet user-secrets set "Jwt:Key" $jwtKey --project src/Monolith
+
+# Рядки підключення до БД (при потребі запуску з реальною MySQL)
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Port=3306;Database=miniproject_auth;User=root;Password=YOUR_PASSWORD" --project src/AuthService
-
-# CatalogService
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Port=3306;Database=miniproject_catalog;User=root;Password=YOUR_PASSWORD" --project src/CatalogService
-
-# BookingService (ЛР2)
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Port=3306;Database=miniproject_booking;User=root;Password=YOUR_PASSWORD" --project src/BookingService
-
-# Monolith
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Port=3306;Database=SportsBooking;User=root;Password=YOUR_PASSWORD" --project src/Monolith
 ```
 
-Бази даних, таблиці та перенесені історичні записи (`Id = 1, 3, 4` із підняттям `AUTO_INCREMENT = 100`) створюються автоматично за допомогою міграцій EF Core під час запуску сервісів або командою:
-
-```powershell
-dotnet ef database update --project src/BookingService
+### 2. Для Docker Compose
+Створіть файл `.env` у корені проєкту на основі `.env.example`:
+```bash
+cp .env.example .env
 ```
+Задайте значення `MYSQL_ROOT_PASSWORD` та `JWT_KEY` у `.env` (цей файл додано до `.gitignore` і він не потрапляє до системи контролю версій).
 
-Окремий SQL-скрипт перенесення даних зі старої БД також доступний у `scripts/migrate-bookings.sql`.
+---
 
 ## Запуск через Docker Compose (Бонус +3 бали)
 
-Усі мікросервіси, шлюз Ocelot та MySQL піднімаються однією командою:
+Підняти всю інфраструктуру (шлюз, мікросервіси та базу даних MySQL) однією командою:
 
 ```powershell
 docker compose up --build
 ```
 
 Після запуску доступні:
-- Шлюз: `http://localhost:5000`
-- AuthService: `http://localhost:5001/swagger`
-- CatalogService: `http://localhost:5002/swagger`
-- BookingService: `http://localhost:5003/swagger`
+- Шлюз та Swagger UI: `http://localhost:5000/swagger`
+- Перевірка здоров'я залежностей (Health Check): `http://localhost:5000/health`
+- Статистика кешу: `http://localhost:5000/health/cache-stats`
+*(Внутрішні порти 5001-5003 закриті назовні з міркувань безпеки).*
 
-## Запуск сервісів вручну
+---
+
+## Запуск сервісів вручну (режим налагодження)
 
 ```powershell
 # Термінал 1 — AuthService (:5001)
@@ -69,60 +117,87 @@ dotnet run --project src/BookingService --launch-profile http
 dotnet run --project src/ApiGateway --launch-profile http
 ```
 
-## Запуск інтеграційних тестів (ЛР2)
+При локальному запуску Swagger окремих сервісів доступний за адресами:
+- AuthService: `http://localhost:5001/swagger`
+- CatalogService: `http://localhost:5002/swagger`
+- BookingService: `http://localhost:5003/swagger`
 
-Проєкт `tests/BookingService.IntegrationTests` використовує `WebApplicationFactory<Program>`, підміняє `ICatalogClient` стабом (`FakeCatalogClient`) і працює з окремою тестовою базою `miniproject_booking_test`:
+---
+
+## Інтеграційні тести
+
+Усі 28 інтеграційних тестів (18 у `ApiGateway.IntegrationTests` + 10 у `BookingService.IntegrationTests`) виконуються в ізольованому середовищі в пам'яті (`WebApplicationFactory` та `WireMock`):
 
 ```powershell
 dotnet test
 ```
 
-## Перевірка роботи через шлюз (`:5000`)
+### Покриті сценарії тестів:
+1. **Складений ендпоінт, сервіси доступні:** повна відповідь 200 OK з даними майданчика та активним бронюванням (`Scenario11`).
+2. **CatalogService недоступний:** повертається 503 ProblemDetails, запит у BookingService не створює некоректних станів (`Scenario12`).
+3. **Реальний таймаут HttpClient у складеному запиті:** при затримці CatalogService понад 2 с спрацьовує ліміт `HttpClient.Timeout = 2s`, шлюз перериває очікування і повертає 503 ProblemDetails (`Scenario12b`).
+4. **BookingService недоступний:** повертається 200 OK зі статусом `"unavailable"` для майданчика (graceful degradation, `Scenario13`).
+5. **Запит без токена:** 401 Unauthorized у форматі ProblemDetails; виклики до сервісів блокуються (`Scenario14`, `Scenario14b`).
+6. **Запит з невалідним або простроченим токеном:** 401 Unauthorized ProblemDetails, шлюз не пускає далі (`Scenario14c`).
+7. **Rate Limiting (перевищення ліміту бронювань):** 429 Too Many Requests із заголовком `Retry-After` та тілом `ProblemDetails` (`Scenario15`).
+8. **Rate Limiting (окремий жорсткіший ліміт на логін):** після вичерпання ліміту логіну (10 або 2 в тесті) логін блокується, а загальні запити каталогу з того ж IP продовжують успішно оброблятися (`Scenario15b`).
+9. **Кеш спільних даних:** перший GET повертає `X-Cache: MISS`, другий GET повертає `X-Cache: HIT`, downstream-сервіс викликається лише один раз (`Scenario16`).
+10. **Інвалідація кешу:** після успішного мутуючого запиту (`PUT`/`POST`) кеш скидається, наступний GET повертає `X-Cache: MISS` та оновлені дані (`Scenario16b`).
+11. **Персональні дані не кешуються:** два різні користувачі з різними JWT бачать виключно власні активні бронювання, downstream опитується двічі (`Scenario17`).
+12. **Майданчик не знайдено:** повертається 404 ProblemDetails (`Scenario18`).
+13. **Таймаут Ocelot:** перевищення 2-секундного ліміту повертає уніфікований `ProblemDetails` (503/504, `Scenario19`).
+14. **Підміна заголовків клієнтом відсікається:** клієнтські `X-User-Id` та `X-User-Roles` примусово очищуються шлюзом і замінюються даними з валідованого JWT (`Scenario20`).
+15. **Health Check шлюзу:** коректно перевіряє доступність CatalogService, BookingService та AuthService.
 
-```powershell
-# 1. Health-check сервісів
-Invoke-RestMethod http://localhost:5000/health
-Invoke-RestMethod http://localhost:5003/health
-
-# 2. Вхід користувача (отримання JWT токена)
-$resp = Invoke-RestMethod http://localhost:5000/api/v1/auth/login -Method POST `
-  -ContentType 'application/json' `
-  -Body '{"email":"admin@sportsbooking.com","password":"Admin123!"}'
-$token = $resp.accessToken
-
-# 3. Створення бронювання з Idempotency-Key через шлюз
-Invoke-RestMethod http://localhost:5000/api/bookings -Method POST `
-  -Headers @{ Authorization = "Bearer $token"; "Idempotency-Key" = "demo-key-001" } `
-  -ContentType 'application/json' `
-  -Body '{"venueId":1,"startTime":"2027-05-10T14:00:00Z","hours":2}'
-
-# 4. Отримання списку своїх бронювань з пагінацією та фільтром за статусом
-Invoke-RestMethod "http://localhost:5000/api/bookings?page=1&pageSize=10&status=Confirmed" `
-  -Headers @{ Authorization = "Bearer $token" }
-```
-
-## Swagger UI
-
-- AuthService: `http://localhost:5001/swagger`
-- CatalogService: `http://localhost:5002/swagger`
-- BookingService: `http://localhost:5003/swagger`
-- Monolith: `http://localhost:5100/swagger`
+---
 
 ## Маршрути Gateway (`ocelot.json`)
 
-| Upstream (клієнт → `:5000`) | Downstream (шлюз → сервіс) |
-|---------------------------|---------------------------|
-| `/api/v1/auth/**` | AuthService `:5001` |
-| `/api/v1/users/**` | AuthService `:5001` |
-| `/api/v1/catalog/**` | CatalogService `:5002` |
-| `/api/bookings`, `/api/bookings/**` | BookingService `:5003` |
-| `/api/**` | Monolith `:5100` |
+| Upstream (клієнт → `:5000`) | Downstream (шлюз → сервіс) | Автентифікація | Таймаут |
+|-----------------------------|----------------------------|----------------|---------|
+| `/api/v1/auth/**` | AuthService `:5001` | Ні | 2000 ms |
+| `/api/v1/users/**` | AuthService `:5001` | Так (Bearer) | 2000 ms |
+| `GET /api/v1/catalog/**` | CatalogService `:5002` | Ні (публічне читання) | 2000 ms |
+| `POST/PUT/DELETE /api/v1/catalog/**` | CatalogService `:5002` | Так (Bearer на шлюзі) | 2000 ms |
+| `/api/bookings`, `/api/bookings/**` | BookingService `:5003` | Так (Bearer) | 2000 ms |
+| `/api/**` | Monolith `:5100` | — | 2000 ms |
+| `/api/gateway/venues/{id}/details` | Складений контролер шлюзу | Так (Bearer) | 2000 ms на виклик |
 
-## Документація
+---
 
-- [Інвентаризація моноліту](docs/monolith-inventory.md)
-- [ADR-0001: Поділ моноліту на сервіси](docs/adr/0001-split-monolith.md)
-- [ADR-0002: Шлюз Ocelot перед монолітом](docs/adr/0002-api-gateway.md)
-- [ADR-0003: Винесення операційного сервісу (BookingService)](docs/adr/0003-operations-extraction.md)
-- [Порівняння базової поведінки (baseline-diff)](docs/baseline-diff.md)
-- [Діаграми архітектури](docs/diagrams/README.md)
+## Відповіді на контрольні питання (ЛР3)
+
+1. **Що таке API Gateway і за що він відповідає?**
+   API Gateway — це єдина вхідна точка (reverse proxy) для всіх клієнтських запитів у мікросервісній архітектурі. Він відповідає за маршрутизацію трафіку, автентифікацію та валідацію токенів, обмеження частоти запитів (Rate Limiting), кешування спільних відповідей, збирання складених відповідей з кількох сервісів, логування та трасування (`X-Correlation-Id`).
+
+2. **Чому в шлюзі не має бути бізнес-логіки? Наведіть приклад правила, яке туди просилося, але не належить.**
+   Шлюз має залишатися легкою та швидкою точкою входу. Додавання бізнес-правил перетворює шлюз на «розподілений моноліт», ускладнює тестування, порушує Single Responsibility Principle і змушує шлюз знати внутрішні структури даних доменів. Приклад: правило «якщо бронювання триває більше 3 годин — надати знижку 10%» або «перевірити, чи майданчик не закритий на ремонт». Це правило належить виключно домену `BookingService` або `CatalogService`.
+
+3. **Чому виклики у складеному ендпоінті виконують паралельно? Як зміниться час відповіді, якщо зробити їх послідовно?**
+   Виклики виконуються паралельно (`Task.WhenAll`), щоб загальний час відповіді клієнту дорівнював `max(T_catalog, T_booking)` (найдовшому виклику), а не їхній сумі `T_catalog + T_booking`. При послідовному виконанні затримка збільшується приблизно вдвічі, що погіршує швидкість завантаження екрана.
+
+4. **Що станеться зі шлюзом, якщо прибрати таймаути, а один із сервісів зависне?**
+   Без таймаутів запити до завислого сервісу блокуватимуть потоки з пулу потоків шлюзу (`ThreadPool starvation`). Черга очікування швидко заповниться, шлюз вичерпає системні ресурси (sockets, пам'ять) і перестане відповідати на будь-які інші запити клієнтів (включно зі здоровими сервісами). Відмова одного сервісу спричинить каскадну відмову всієї системи.
+
+5. **Чому клієнт має відрізняти «даних немає» від «сервіс недоступний»?**
+   Якщо недоступність операційного сервісу мовчки трансформувати в `null` («даних немає»), клієнт вирішить, що у нього немає активного бронювання, і створить повторне бронювання на той самий час, що призведе до конфлікту або подвійної оплати. Тому шлюз повертає чіткий статус: `"active"`, `"none"` або `"unavailable"`.
+
+6. **Чому перевірку токена винесли на шлюз? За якої умови сервіс може довіряти заголовку X-User-Id?**
+   Шлюз перевіряє валідність JWT-токена один раз на вході в периметр системи, відсікаючи неавторизовані запити без зайвого міжсервісного трафіку, і видаляє будь-які підроблені заголовки `X-User-Id`, які міг надіслати клієнт. Далі шлюз прокидає як сам токен, так і перевірені заголовки `X-User-Id` і `X-User-Roles` до мікросервісів. Внутрішній сервіс може сліпо довіряти заголовку `X-User-Id` лише за умови, що прямий доступ до портів сервісів ззовні повністю закритий (порти `5001-5003` у Docker мають лише `expose`, а не `ports`). У нашій системі реалізовано найнадійніший підхід defense-in-depth: шлюз відсікає анонімні виклики та підроблені заголовки, прокидаючи валідні дані, а сервіси додатково валідують токен.
+
+7. **Які дані ви кешуєте і чому саме їх? Чому персональні дані не кешують?**
+   Кешуються лише спільні для всіх користувачів публічні дані каталогу майданчиків (`GET /api/v1/catalog/**`). Персональні дані (список моїх бронювань, активне бронювання, профіль) не кешуються взагалі, оскільки кешування персональних даних створює критичну вразливість витоку приватної інформації (коли відповідь одного клієнта віддається іншому).
+
+8. **З чого складається ваш ключ кешу? Як ви обирали TTL?**
+   Ключ кешу формується за схемою: `GET:{path}?{sortedQuery}` (наприклад `GET:/api/v1/catalog/items?category=Football&page=1`). Сортування параметрів запиту гарантує стабільність ключа незалежно від порядку параметрів у URL. TTL обрано в 30 секунд: це достатньо, щоб зняти пікове навантаження з бази даних каталогу, але при цьому гарантує, що клієнт не бачитиме застарілі дані довше ніж півхвилини навіть у разі затримки інвалідації.
+
+9. **Навіщо потрібна інвалідизація, якщо є TTL?**
+   TTL гарантує автоматичне очищення за часом (eventual consistency), але якщо адміністратор щойно змінив ціну або назву майданчика через `PUT` / `POST`, без інвалідації користувачі бачитимуть старі дані ще до 30 секунд. Інвалідація після успішних мутуючих операцій миттєво скасовує кеш. У нашій системі інвалідується весь кеш каталогу через `CancellationChangeToken`, оскільки зміна навіть одного майданчика впливає не лише на його картку, а й на загальні списки майданчиків, фільтрацію та пагінацію.
+
+10. **Чим fixed window відрізняється від token bucket? Що ви обрали і чому?**
+    - `Fixed Window`: рахує кількість запитів у фіксованому календарному інтервалі (наприклад 1 хвилина). Найпростіший в реалізації, але на межі двох вікон може пропустити подвійний ліміт (сплеск).
+    - `Token Bucket`: жетони додаються до кошика з рівномірною швидкістю; кожен запит забирає жетон. Дозволяє короткочасні контрольовані сплески до розміру кошика, забезпечуючи рівномірніше згладжування трафіку.
+    - У роботі для захисту ендпоінтів шлюзу використано вбудований у .NET Fixed Window Limiter (через простоту конфігурації, надійність та достатність для захисту від brute-force атак на авторизацію та DOS-атак на створення бронювань).
+
+11. **Чому ліміт для анонімних запитів рахують за IP, а для авторизованих — за користувачем?**
+    Для анонімних запитів ідентифікатор користувача ще невідомий, тому єдиним критерієм є IP-адреса. Для авторизованих запитів лімітування за `userId` (клейм `sub`) запобігає ситуації, коли кілька легітимних користувачів з однієї корпоративної мережі чи NAT ділять спільний IP і блокують одне одного; водночас це блокує зловмисника, який намагається обійти ліміт шляхом ротації IP-адрес під одним акаунтом.

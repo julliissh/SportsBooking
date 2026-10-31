@@ -1,6 +1,9 @@
-### Налаштування змінних (для перевірки моноліту :5100, сервісу :5003 або шлюзу :5000)
+### Налаштування змінних (усі запити йдуть через API Gateway :5000 — єдині вхідні двері)
 @baseUrl = http://localhost:5000
-@authUrl = http://localhost:5001
+@authUrl = http://localhost:5000
+
+# задай свій пароль адміна локально або через змінну оточення, не коміть його
+@adminPassword = {{$processEnv ADMIN_PASSWORD}}
 
 ### 0. Отримання JWT токена власника (User 1 / Admin)
 # @name loginOwner
@@ -9,7 +12,7 @@ Content-Type: application/json
 
 {
   "email": "admin@sportsbooking.com",
-  "password": "Admin123!"
+  "password": "{{adminPassword}}"
 }
 
 ###
