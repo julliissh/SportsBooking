@@ -75,4 +75,9 @@ public interface IBookingService
         int currentUserId,
         bool isAdmin,
         CancellationToken ct = default);
+
+    Task<BookingResponseDto?> GetActiveForVenueAsync(
+        int currentUserId,
+        int venueId,
+        CancellationToken ct = default);
 }

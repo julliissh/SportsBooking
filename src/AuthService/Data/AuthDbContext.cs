@@ -45,7 +45,7 @@ public class AuthDbContext : DbContext
             new Role { Id = 2, Name = "Admin" }
         );
 
-        // Seed admin user (password: Admin123!)
+        // Seed admin user
         modelBuilder.Entity<User>().HasData(
             new User
             {

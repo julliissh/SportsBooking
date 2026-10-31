@@ -74,4 +74,13 @@ public class BookingRepository : IBookingRepository
 
     public async Task SaveChangesAsync(CancellationToken ct = default)
         => await _db.SaveChangesAsync(ct);
+
+    public async Task<Booking?> GetActiveForVenueAsync(int userId, int venueId, CancellationToken ct = default)
+        => await _db.Bookings
+            .AsNoTracking()
+            .Where(b => b.UserId == userId
+                     && b.VenueId == venueId
+                     && b.Status == BookingStatus.Confirmed)
+            .OrderByDescending(b => b.StartTime)
+            .FirstOrDefaultAsync(ct);
 }

@@ -4,14 +4,14 @@ services:
     container_name: sportsbooking-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-292929}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - "3307:3306"
+      - "127.0.0.1:3307:3306"
     volumes:
       - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-292929}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -22,12 +22,12 @@ services:
       dockerfile: src/AuthService/Dockerfile
     container_name: sportsbooking-auth
     restart: on-failure
-    ports:
-      - "5001:5001"
+    expose:
+      - "5001"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_auth;User=root;Password=${MYSQL_ROOT_PASSWORD:-292929}
-      Jwt__Key: ${JWT_KEY:-super-secret-key-min-32-bytes-long!!}
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_auth;User=root;Password=${MYSQL_ROOT_PASSWORD}
+      Jwt__Key: ${JWT_KEY}
       Jwt__Issuer: SportsBookingAuth
       Jwt__Audience: SportsBookingClients
     depends_on:
@@ -40,12 +40,12 @@ services:
       dockerfile: src/CatalogService/Dockerfile
     container_name: sportsbooking-catalog
     restart: on-failure
-    ports:
-      - "5002:5002"
+    expose:
+      - "5002"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_catalog;User=root;Password=${MYSQL_ROOT_PASSWORD:-292929}
-      Jwt__Key: ${JWT_KEY:-super-secret-key-min-32-bytes-long!!}
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_catalog;User=root;Password=${MYSQL_ROOT_PASSWORD}
+      Jwt__Key: ${JWT_KEY}
       Jwt__Issuer: SportsBookingAuth
       Jwt__Audience: SportsBookingClients
     depends_on:
@@ -58,13 +58,13 @@ services:
       dockerfile: src/BookingService/Dockerfile
     container_name: sportsbooking-booking
     restart: on-failure
-    ports:
-      - "5003:5003"
+    expose:
+      - "5003"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_booking;User=root;Password=${MYSQL_ROOT_PASSWORD:-292929}
+      ConnectionStrings__DefaultConnection: Server=mysql;Port=3306;Database=miniproject_booking;User=root;Password=${MYSQL_ROOT_PASSWORD}
       Services__CatalogUrl: http://catalog-service:5002
-      Jwt__Key: ${JWT_KEY:-super-secret-key-min-32-bytes-long!!}
+      Jwt__Key: ${JWT_KEY}
       Jwt__Issuer: SportsBookingAuth
       Jwt__Audience: SportsBookingClients
     depends_on:
@@ -89,6 +89,11 @@ services:
       Gateway__CatalogPort: 5002
       Gateway__BookingHost: booking-service
       Gateway__BookingPort: 5003
+      Services__CatalogUrl: http://catalog-service:5002
+      Services__BookingUrl: http://booking-service:5003
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: SportsBookingAuth
+      Jwt__Audience: SportsBookingClients
     depends_on:
       auth-service:
         condition: service_started

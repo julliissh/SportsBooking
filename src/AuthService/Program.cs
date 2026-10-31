@@ -12,6 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // JWT
 var jwt = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwt["Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new InvalidOperationException("Jwt:Key is not configured. Configure it via user-secrets or environment variables.");
+}
 builder.Services.Configure<JwtOptions>(jwt);
 
 // Database
@@ -32,7 +37,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwt["Issuer"],
             ValidAudience = jwt["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.FromSeconds(30)
         };
     });
@@ -85,6 +90,22 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     db.Database.Migrate();
+
+    if (!db.Users.Any(u => u.Email == "user2@sportsbooking.com"))
+    {
+        var user2 = new AuthService.Models.User
+        {
+            Email = "user2@sportsbooking.com",
+            DisplayName = "Second User",
+            PasswordHash = "$2a$11$Sw4nvueeSlydwF5WPl/cAueBtFeVOX6YYoz14JJ.88DYCyR8SsY3O",
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
+        };
+        db.Users.Add(user2);
+        db.SaveChanges();
+        db.UserRoles.Add(new AuthService.Models.UserRole { UserId = user2.Id, RoleId = 1 });
+        db.SaveChanges();
+    }
 }
 
 // Global error handler — no stack trace in response

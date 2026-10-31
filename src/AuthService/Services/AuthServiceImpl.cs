@@ -38,7 +38,7 @@ public class AuthServiceImpl : IAuthService
         await _userRepo.AddUserWithRoleAsync(user, "User");
 
         var tokens = await IssueTokensAsync(user);
-        _logger.LogInformation("User registered: {Email}", request.Email);
+        _logger.LogInformation("User registered: UserId={UserId}", user.Id);
         return (tokens, null);
     }
 
@@ -48,12 +48,12 @@ public class AuthServiceImpl : IAuthService
 
         if (user is null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            _logger.LogWarning("Failed login attempt for {Email}", request.Email);
+            _logger.LogWarning("Failed login attempt");
             return (null, "Invalid credentials");
         }
 
         var tokens = await IssueTokensAsync(user);
-        _logger.LogInformation("User logged in: {Email}", request.Email);
+        _logger.LogInformation("User logged in: UserId={UserId}", user.Id);
         return (tokens, null);
     }
 
